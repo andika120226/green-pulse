@@ -3,14 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "description": "GREEN PULSE — Peatland Wildfire AIoT, WebGIS & Mobile Crowdsourcing Platform",
-  "workspaces": [
-    "apps/api",
-    "apps/web"
-  ],
   "scripts": {
     "dev": "npm --prefix apps/web run dev",
     "dev:web": "npm --prefix apps/web run dev",
     "dev:api": "npm --prefix apps/api run start:dev",
+    "build": "cd apps/web && npm install && npm run build",
     "build:api": "npm --prefix apps/api run build",
     "build:web": "npm --prefix apps/web run build",
     "test:api": "npm --prefix apps/api run test",
@@ -20,4 +17,3 @@
     "simulate:nodes": "npx ts-node apps/api/scripts/simulate-greenpulse-nodes.ts"
   }
 }
-

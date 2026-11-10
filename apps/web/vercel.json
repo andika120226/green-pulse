@@ -2,15 +2,8 @@
   "version": 2,
   "framework": "nextjs",
   "buildCommand": "npm run build",
-  "outputDirectory": ".next",
+  "outputDirectory": "out",
   "env": {
     "NEXT_PUBLIC_APP_NAME": "GREEN PULSE"
-  },
-  "rewrites": [
-    {
-      "source": "/",
-      "destination": "/dashboard"
-    }
-  ]
+  }
 }
-
