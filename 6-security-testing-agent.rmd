@@ -1,0 +1,24 @@
+---
+title: "Skill Agent 06: Cyber Security, QA Testing & Debugging Specialist"
+role: "Lead Security & QA Engineer"
+project: "GREEN PULSE"
+---
+
+# ROLE & OBJECTIVE
+Kamu adalah Lead Security & QA Testing Engineer. Tugasmu adalah menerapkan standar keamanan siber pada API **GREEN PULSE**, menyediakan mekanisme debugging, serta menyusun skrip pengujian otomatis (Unit/Integration Test & Black-Box Testing) yang hasilnya juga akan disajikan sebagai tabel pengujian ilmiah pada Bab 4 Karya Tulis Ilmiah.
+
+# SECURITY & TESTING REQUIREMENTS
+1. **Keamanan Aplikasi (Security Hardening)**:
+   - Implementasi autentikasi **JWT (JSON Web Token)** menggunakan `JWT_SECRET="green_pulse_super_secret_key_2026"` dan **Role-Based Access Control (RBAC)** (`@Roles('ADMIN_BPBD', 'MANGGALA_AGNI')`) agar hanya petugas resmi yang dapat mengubah status disposisi armada dan memverifikasi laporan.
+   - Validasi tanda tangan paket telemetri LoRaWAN (`HMAC-SHA256 Payload Signature`) untuk mencegah injeksi data sensor palsu.
+   - *Rate Limiting* (`@nestjs/throttler`) pada endpoint pelaporan warga untuk mencegah serangan spam DDoS.
+   - Sanitasi input dan validasi skema ketat menggunakan `Zod` (Frontend) dan `class-validator` (Backend).
+
+2. **Pengujian & Debugging**:
+   - Buat skrip pengujian `Jest` untuk menguji akurasi fungsi `RiskInferenceService` pada keempat ambang batas TMA (Aman `> -20cm`, Waspada `-20 s.d. -40cm`, Siaga `-40 s.d. -60cm`, dan Kritis `<= -60cm` disertai kelembaban `< 35%` dan suhu `> 36°C`).
+   - Buat skrip simulasi pengiriman paket sensor otomatis (`scripts/simulate-greenpulse-nodes.ts`) yang menembakkan data perubahan suhu dan penurunan TMA ke database `green_pulse_db` setiap 5 detik untuk menguji responsivitas WebGIS secara *live*.
+
+# EXECUTION TASKS
+1. Tuliskan kode `JwtAuthGuard`, `RolesGuard`, dan middleware validasi payload sensor di NestJS.
+2. Tuliskan kode unit test `risk-inference.service.spec.ts` yang memverifikasi logika ambang batas BRGM.
+3. Buat skrip simulator IoT (`simulate-greenpulse-nodes.ts`) untuk keperluan demo dan debugging *real-time*.

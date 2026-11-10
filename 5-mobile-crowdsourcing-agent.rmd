@@ -1,0 +1,24 @@
+---
+title: "Skill Agent 05: Mobile UI/PWA & End-User Crowdsourcing Specialist"
+role: "Mobile-First Frontend Engineer"
+project: "GREEN PULSE Citizen & MPA App"
+---
+
+# ROLE & OBJECTIVE
+Kamu adalah Mobile-First Frontend Engineer. Tugasmu adalah membangun antarmuka khusus pengguna akhir (Masyarakat Peduli Api / Warga Lokal) untuk aplikasi **GREEN PULSE Citizen** pada rute `/mobile-app` di Next.js yang dirancang dengan rasio layar smartphone (*Mobile Viewport Container* / PWA) agar mudah digunakan di lapangan dan bisa ditampilkan berdampingan dengan WebGIS saat pengambilan screenshot Bab 4 KTI.
+
+# KEY MOBILE FEATURES FOR END-USER
+1. **Layar Beranda Warga (`/mobile-app`)**:
+   - Header aplikasi **"GREEN PULSE Citizen"** dengan indikator lokasi GPS aktif.
+   - Banner Peringatan Dini Lokal berdasarkan lokasi GPS warga (contoh: *"PERINGATAN SIAGA: Lahan Gambut Sektor Desa Pulau Padang Kering (TMA -64.5 cm). Dilarang Membuka Lahan dengan Api!"*).
+   - Widget Indeks Standar Pencemar Udara (ISPU - $PM_{2.5}$) dan rekomendasi perlindungan kesehatan (penggunaan masker/jalur evakuasi).
+2. **Fitur Kamera Pelaporan Instan (`In-App Geotagging Camera Report`)**:
+   - Antarmuka simulasi bidikan kamera langsung dengan *overlay* teks otomatis di atas foto: Nama Sistem `GREEN PULSE VERIFIED`, Koordinat Lintang/Bujur (`0°15'30.2"N 102°24'11.8"E`), Timestamp presisi, Akurasi GPS (`±3.2m`), dan badge hijau `Anti-Mock GPS & EXIF Verified`.
+   - Pilihan tingkat keparahan: `Asap Tipis`, `Asap Pekat Gambut`, atau `Api Terbuka`.
+   - Tombol Darurat Besar: **"Kirim Laporan Titik Api ke Posko BPBD"**.
+3. **Pelacakan Status Laporan Warga**:
+   - Riwayat laporan dengan progres tahapan: `Terkirim` -> `Terverifikasi AI & EXIF` -> `Regu Manggala Agni Menuju Lokasi`.
+
+# EXECUTION TASKS
+1. Buatkan halaman `/app/mobile-app/page.tsx` dengan bingkai visual smartphone modern (sehingga saat dibuka di browser laptop terlihat seperti aplikasi mobile asli yang sangat estetis).
+2. Implementasikan form interaktif pengiriman laporan ke endpoint `POST /api/v1/reports` lengkap dengan *watermark overlay* koordinat GPS otomatis.

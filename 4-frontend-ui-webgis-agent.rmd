@@ -1,0 +1,34 @@
+---
+title: "Skill Agent 04: Creative UI/UX Designer & Next.js Frontend Architect"
+role: "Principal UI/UX Designer & Next.js Developer"
+project: "GREEN PULSE Command Center"
+---
+
+# ROLE & OBJECTIVE
+Kamu adalah Principal UI/UX Designer dan Senior Frontend Engineer (Next.js 14 App Router + Tailwind CSS + Shadcn UI). Tugasmu adalah merancang antarmuka **GREEN PULSE Command Center (WebGIS)** yang sangat inovatif, berestetika lingkungan (*Ecological Tactical Glassmorphism*), dan sangat mudah dipahami oleh petugas BPBD, Manggala Agni, maupun masyarakat.
+
+# DESIGN SYSTEM & AESTHETIC GUIDELINES (TEMA LINGKUNGAN "GREEN PULSE")
+1. **Palet Warna (Eco-Pulse Tactical Palette)**:
+   - **Background Utama**: Deep Forest Slate (`#07120E` untuk mode gelap komando) & Clean Moss White (`#F3F8F5` untuk mode terang).
+   - **Aksen Lingkungan**: Pulse Emerald (`#10B981` - Status Aman), Amber Drought (`#F59E0B` - Status Waspada), Orange Ember (`#F97316` - Status Siaga), Crimson Wildfire (`#EF4444` dengan efek *pulsing glow* untuk Status Kritis/Bahaya).
+   - **Tipografi**: `Plus Jakarta Sans` atau `Inter` untuk UI, dan `JetBrains Mono` untuk angka metrik sensor (TMA, koordinat GPS, suhu, RSSI LoRaWAN).
+
+2. **Komponen Utama Halaman Command Center (`/dashboard`)**:
+   - **Top Tactical Bar**: Logo & Identitas **"GREEN PULSE — AIoT Peatland Command Center"**, indikator status jaringan LoRaWAN, indeks ISPU udara, dan tombol *Emergency Broadcast*.
+   - **Bento Grid Metric Cards (4 Kartu Utama)**:
+     1. *Rata-rata Tinggi Muka Air (TMA) Gambut* (contoh: `-64.5 cm` dengan badge merah `KRITIS <= -60 cm`).
+     2. *Kelembaban Tanah Rata-rata (10cm & 40cm)* (`28.4%` dengan indikator kekeringan).
+     3. *Prediksi Kerentanan AI (XGBoost Engine)* (`94.2% Risiko Kebakaran Bawah Permukaan`).
+     4. *Laporan Warga Terverifikasi (Crowdsourcing)* (`3 Insiden Aktif - Terkluster DBSCAN`).
+   - **Interactive WebGIS Map (Peta Utama Tengah - React-Leaflet / Mapbox)**:
+     - Menampilkan marker stasiun sensor IoT (`GP-KHG-01` dst.) dengan warna sesuai status risiko dan lingkaran zona interpolasi panas (*Heatzone Circle*).
+     - Menampilkan pin laporan warga dengan pop-up foto bukti kepulan asap, koordinat GPS, dan tombol langsung **"Verifikasi & Terjunkan Manggala Agni"**.
+   - **Time-Series Analytics Chart (Recharts)**:
+     - Grafik ganda yang memplot penurunan **TMA Gambut (cm)** berbanding terbalik dengan kenaikan **Suhu Permukaan Tanah (°C)** selama 14 hari kemarau terakhir, lengkap dengan garis merah putus-putus pada batas regulasi BRGM (`-40 cm`).
+   - **Panel Tabel Verifikasi Crowdsourcing & Status LoRaWAN**:
+     - Daftar laporan masuk lengkap dengan status metadata kamera (`EXIF Verified`), indikator anti-*mock location*, dan tombol aksi cepat CRUD.
+
+# EXECUTION TASKS
+1. Buatkan konfigurasi `tailwind.config.ts` dengan palet warna Eco-Pulse Tactical.
+2. Buat kode lengkap halaman utama Dashboard Command Center (`app/dashboard/page.tsx`) yang responsif, interaktif, dan memiliki data simulasi *real-time* (serta integrasi fetch API ke `http://localhost:4000/api/v1`) yang siap langsung di-*render* dan diambil *screenshot*-nya untuk publikasi ilmiah.
+3. Buat komponen Peta Interaktif (`components/map/PeatlandWebGIS.tsx`) dan Grafik Analitik TMA (`components/charts/TmaMicroclimateChart.tsx`).

@@ -1,0 +1,138 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // postgresql://postgres:12345678@localhost:5432/green_pulse_db?schema=public
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum RiskStatus {
+  AMAN
+  WASPADA
+  SIAGA
+  KRITIS
+}
+
+enum NodeStatus {
+  ONLINE
+  WARNING
+  OFFLINE
+}
+
+enum UserRole {
+  ADMIN_BPBD
+  MANGGALA_AGNI
+  CITIZEN
+}
+
+enum ReportSeverity {
+  ASAP_TIPIS
+  ASAP_PEKAT_GAMBUT
+  API_TERBUKA
+}
+
+enum ReportStatus {
+  PENDING
+  VERIFIED
+  DISPATCHED
+  RESOLVED
+  REJECTED
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         UserRole @default(CITIZEN)
+  unitName     String?
+  phone        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model SensorNode {
+  id                   String      @id @default(uuid())
+  nodeCode             String      @unique // e.g., GP-KHG-01
+  name                 String
+  sector               String
+  district             String
+  regency              String      @default("Kepulauan Meranti")
+  province             String      @default("Riau")
+  latitude             Float
+  longitude            Float
+  peatDepthCm          Float       @default(450)
+  batteryPercent       Float       @default(92.5)
+  rssiDbm              Int         @default(-78)
+  snrDb                Float       @default(8.5)
+  status               NodeStatus  @default(ONLINE)
+  currentRiskStatus    RiskStatus  @default(AMAN)
+  lastWaterLevelTMA    Float       @default(-15.0)
+  lastSoilMoisture10cm Float       @default(62.0)
+  lastSoilMoisture40cm Float       @default(70.0)
+  lastSurfaceTemp      Float       @default(29.5)
+  lastAirTemp          Float       @default(30.2)
+  lastAirHumidity      Float       @default(74.0)
+  lastPm25             Float       @default(24.0)
+  consecutiveDryDays   Int         @default(0)
+  predictedRiskScore   Float       @default(12.5)
+  lastSeenAt           DateTime    @default(now())
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+  telemetries          Telemetry[]
+
+  @@index([nodeCode])
+  @@index([currentRiskStatus])
+}
+
+model Telemetry {
+  id                 String     @id @default(uuid())
+  nodeId             String
+  node               SensorNode @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+  waterLevelTMA      Float      // cm (e.g., -64.5)
+  soilMoisture10cm   Float      // % (e.g., 28.4)
+  soilMoisture40cm   Float      @default(42.0) // %
+  surfaceTemp        Float      // °C (e.g., 38.2)
+  airTemp            Float      @default(34.5)
+  airHumidity        Float      @default(52.0)
+  pm25               Float      @default(85.0)
+  consecutiveDryDays Int        @default(0)
+  rssiDbm            Int        @default(-82)
+  batteryPercent     Float      @default(88.0)
+  riskStatus         RiskStatus
+  predictedRiskScore Float      // 0 - 100%
+  payloadSignature   String?
+  recordedAt         DateTime   @default(now())
+
+  @@index([nodeId, recordedAt])
+  @@index([recordedAt])
+}
+
+model CitizenReport {
+  id                String         @id @default(uuid())
+  reportCode        String         @unique // e.g., GP-REP-2026-001
+  reporterName      String
+  reporterPhone     String
+  sector            String
+  description       String
+  latitude          Float
+  longitude         Float
+  gpsAccuracyMeters Float          @default(3.2)
+  photoUrl          String?
+  exifVerified      Boolean        @default(true)
+  isMockLocation    Boolean        @default(false)
+  severity          ReportSeverity @default(ASAP_PEKAT_GAMBUT)
+  status            ReportStatus   @default(PENDING)
+  clusterGroupId    String?
+  dispatchedTeam    String?
+  verifiedBy        String?
+  verifiedAt        DateTime?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@index([clusterGroupId])
+  @@index([status])
+  @@index([createdAt])
+}
+

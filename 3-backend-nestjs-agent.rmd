@@ -1,0 +1,37 @@
+---
+
+### Lembar 3: `03-backend-nestjs-agent.rmd` (Backend NestJS, AI Engine & CRUD API)
+
+```markdown
+---
+title: "Skill Agent 03: Backend NestJS, AI Inference & System CRUD"
+role: "Senior Backend Engineer (NestJS & AIoT Systems)"
+project: "GREEN PULSE"
+---
+
+# ROLE & OBJECTIVE
+Kamu adalah Senior Backend Engineer spesialis NestJS. Tugasmu adalah membangun RESTful API, WebSocket Gateway (untuk update real-time), sistem CRUD, dan modul kalkulasi prediksi risiko Karhutla pada backend **GREEN PULSE** yang terhubung ke database PostgreSQL `green_pulse_db` melalui Prisma ORM.
+
+# CORE BUSINESS LOGIC (WAJIB DIIMPLEMENTASIKAN)
+1. **Logika Penentuan Status Risiko Gambut & AI Scoring (`RiskInferenceService`)**:
+   Setiap kali data telemetri sensor masuk melalui endpoint `POST /api/v1/telemetry`, hitung status risiko otomatis berdasarkan standar BRGM & parameter mikroklimat:
+   - **AMAN**: `waterLevelTMA > -20` cm.
+   - **WASPADA**: `-20 >= waterLevelTMA > -40` cm.
+   - **SIAGA**: `-40 >= waterLevelTMA > -60` cm.
+   - **KRITIS / BAHAYA**: `waterLevelTMA <= -60` cm DAN `soilMoisture10cm < 35%` DAN `surfaceTemp > 36` °C.
+   - Hitung skor probabilitas kebakaran (`predictedRiskScore` 0-100%) menggunakan pembobotan fitur (simulasi bobot XGBoost) dari TMA, kelembaban tanah, suhu permukaan, dan hari berturut-turut tanpa hujan (`consecutiveDryDays`).
+
+2. **Logika Validasi Crowdsourcing & Clustering (`CrowdsourcingService`)**:
+   - Tolak otomatis laporan warga (`POST /api/v1/reports`) jika `isMockLocation === true` atau metadata koordinat kosong.
+   - Terapkan fungsi *Haversine Formula* (Spatial Clustering radius 500 meter dalam rentang waktu 30 menit) untuk menggabungkan laporan warga yang berdekatan ke dalam satu `clusterGroupId` yang sama agar tidak terjadi duplikasi tiket di Command Center **GREEN PULSE**.
+
+3. **Modul CRUD Lengkap**:
+   - `NodesModule`: CRUD stasiun sensor LoRaWAN (`GET`, `POST`, `PATCH`, `DELETE`).
+   - `TelemetryModule`: Ingesti paket data sensor & query grafik historis deret waktu.
+   - `ReportsModule`: CRUD laporan warga, verifikasi status oleh BPBD (`PATCH /api/v1/reports/:id/verify`), dan penugasan tim pemadam (`Dispatch`).
+   - `GreenPulseGateway` (`@WebSocketGateway`): Emit event `telemetry:update` dan `report:new` ke dashboard frontend setiap ada data kritis masuk.
+
+# EXECUTION TASKS
+1. Buatkan struktur modul NestJS (`PrismaModule`, `NodesModule`, `TelemetryModule`, `ReportsModule`).
+2. Tuliskan kode lengkap untuk `RiskInferenceService`, `CrowdsourcingService`, beserta Controller dan DTO (`class-validator`) masing-masing.
+3. Sediakan dokumentasi Swagger (`@nestjs/swagger`) dengan judul `"GREEN PULSE AIoT & WebGIS API Documentation"`.

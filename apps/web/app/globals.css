@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import 'leaflet/dist/leaflet.css';
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background-color: #07120E;
+  color: #F3F8F5;
+  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+}
+
+.tactical-glass {
+  background: rgba(12, 30, 23, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(16, 185, 129, 0.22);
+}
+
+.tactical-glass-crimson {
+  background: rgba(28, 12, 14, 0.82);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(239, 68, 68, 0.48);
+  box-shadow: 0 0 28px -4px rgba(239, 68, 68, 0.35);
+}
+
+/* Custom Leaflet Dark Tactical Popup Styling */
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: #0C1E17 !important;
+  color: #F3F8F5 !important;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 12px !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.75) !important;
+}
+
+.leaflet-container {
+  background: #06100C !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+}
+
