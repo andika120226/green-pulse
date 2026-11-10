@@ -619,7 +619,294 @@ export const STORAGE_KEYS = {
   REPORTS: 'green_pulse_reports_v3_sumkal',
   PROPOSALS: 'green_pulse_proposals_v3_sumkal',
   PATROLS: 'green_pulse_patrols_v3_sumkal',
+  COMMUNITY_POSTS: 'green_pulse_community_posts_v1',
+  CAMPAIGNS: 'green_pulse_campaigns_v1',
+  TRANSACTIONS: 'green_pulse_transactions_v1',
 };
+
+export interface CommunityCommentData {
+  id: string;
+  authorName: string;
+  authorRole: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface CommunityPostData {
+  id: string;
+  authorName: string;
+  authorRole: 'WARGA_LOKAL' | 'RELAWAN_MPA' | 'PETUGAS_BPBD_BRGM' | 'TIM_AUDIT_TRANSPARANSI';
+  locationTag: string;
+  island: 'KALIMANTAN' | 'SUMATERA' | 'NASIONAL';
+  category:
+    | 'BERITA_BENCANA_TERKINI'
+    | 'LAPORAN_HASIL_DONASI'
+    | 'AKSI_SAVE_TREE'
+    | 'PERINGATAN_KOMUNITAS';
+  title: string;
+  content: string;
+  imageUrl?: string;
+  likes: number;
+  treesPlantedImpact?: number;
+  disbursedAmountRp?: number;
+  linkedCampaignId?: string;
+  verifiedAuditCode?: string;
+  createdAt: string;
+  comments: CommunityCommentData[];
+}
+
+export interface DonationBreakdownItem {
+  item: string;
+  amountRp: number;
+  status: 'TERSALURKAN' | 'DALAM_PROSES';
+}
+
+export interface DonationCampaignData {
+  id: string;
+  campaignCode: string;
+  title: string;
+  location: string;
+  island: 'KALIMANTAN' | 'SUMATERA';
+  organizer: string;
+  targetAmountRp: number;
+  collectedAmountRp: number;
+  targetTrees: number;
+  plantedTrees: number;
+  donorCount: number;
+  imageUrl: string;
+  status: 'PENGGALANGAN_AKTIF' | 'DISALURKAN_KE_PUSAT' | 'TERLAKSANA_DILAPORKAN';
+  transparencyStage: 1 | 2 | 3 | 4; // 1: Terkumpul, 2: Diteruskan ke Pusat, 3: Eksekusi Lapangan, 4: Laporan Terbit
+  summary: string;
+  impactReportSummary?: string;
+  impactReportDate?: string;
+  breakdown: DonationBreakdownItem[];
+}
+
+export interface DonationTransactionData {
+  id: string;
+  txCode: string;
+  donorName: string;
+  campaignId: string;
+  campaignTitle: string;
+  amountRp: number;
+  treesSponsored: number;
+  message: string;
+  paymentMethod: string;
+  status: 'TERVERIFIKASI_PUBLIK';
+  createdAt: string;
+}
+
+export const INITIAL_CAMPAIGNS: DonationCampaignData[] = [
+  {
+    id: 'camp-01',
+    campaignCode: 'DONASI-KALTENG-01',
+    title: 'Darurat Pompa Sekat Kanal & Reboisasi 5.000 Pohon Belangeran KHG Sebangau',
+    location: 'Kab. Pulang Pisau & Palangka Raya, Kalimantan Tengah',
+    island: 'KALIMANTAN',
+    organizer: 'Posko Gabungan BPBD Kalteng, BRGM & MPA Jabiren Raya',
+    targetAmountRp: 85000000,
+    collectedAmountRp: 68450000,
+    targetTrees: 5000,
+    plantedTrees: 3850,
+    donorCount: 342,
+    imageUrl:
+      'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=900&q=80',
+    status: 'DISALURKAN_KE_PUSAT',
+    transparencyStage: 3,
+    summary:
+      'Bantuan pengadaan selang pemadam tekanan tinggi, operasional pompa pembasahan kubah gambut Eks-PLG Blok C, serta penanaman kembali pohon endemik Belangeran & Jelutung.',
+    impactReportSummary:
+      'Tahap I & II (Rp 52.000.000) telah diteruskan ke Posko Pusat Satgas Kalteng: 2 unit pompa Tohatsu dan 3.850 bibit pohon Belangeran telah ditanam bersama warga Desa Jabiren.',
+    impactReportDate: '10 Nov 2026',
+    breakdown: [
+      { item: '2 Unit Pompa Tekanan Tinggi & 10 Roll Selang Posko MPA', amountRp: 32000000, status: 'TERSALURKAN' },
+      { item: '3.850 Bibit Pohon Gambut Belangeran & Pupuk Organik', amountRp: 20000000, status: 'TERSALURKAN' },
+      { item: 'Logistik Masker N95, Oksigen & Nutrisi Regu Pemadam', amountRp: 16450000, status: 'DALAM_PROSES' },
+    ],
+  },
+  {
+    id: 'camp-02',
+    campaignCode: 'DONASI-RIAU-02',
+    title: 'Gerakan 4.000 Pohon Ramin (Save Tree) & Sumur Bor Desa Pulau Padang',
+    location: 'Kab. Kepulauan Meranti, Provinsi Riau (Sumatera)',
+    island: 'SUMATERA',
+    organizer: 'Masyarakat Peduli Api (MPA) Merbau & KPH Riau',
+    targetAmountRp: 55000000,
+    collectedAmountRp: 55000000,
+    targetTrees: 4000,
+    plantedTrees: 4000,
+    donorCount: 289,
+    imageUrl:
+      'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=900&q=80',
+    status: 'TERLAKSANA_DILAPORKAN',
+    transparencyStage: 4,
+    summary:
+      'Pembangunan 3 titik sumur bor artesis di koridor rawan terbakar Blok A1 dan penanaman 4.000 bibit pohon Ramin & Sagu untuk menjaga kelembaban tanah gambut.',
+    impactReportSummary:
+      '100% TERLAKSANA & TERSALURKAN: 3 titik sumur bor telah aktif mengalirkan air ke sekat kanal, dan 4.000 bibit pohon telah selesai ditanam oleh 65 relawan warga.',
+    impactReportDate: '09 Nov 2026',
+    breakdown: [
+      { item: 'Pengeboran 3 Titik Sumur Bor Artesis + Pipa Hydrant Gambut', amountRp: 30000000, status: 'TERSALURKAN' },
+      { item: 'Penanaman 4.000 Bibit Pohon Ramin & Sagu (Save Tree)', amountRp: 18000000, status: 'TERSALURKAN' },
+      { item: 'Peralatan APD & Sepatu Boot Tahan Panas Relawan MPA', amountRp: 7000000, status: 'TERSALURKAN' },
+    ],
+  },
+  {
+    id: 'camp-03',
+    campaignCode: 'DONASI-SUMSEL-KALBAR-03',
+    title: 'Tanggap Asap & Restorasi Hutan Gambut OKI (Sumsel) & Kubu Raya (Kalbar)',
+    location: 'Pampangan OKI (Sumsel) & Rasau Jaya (Kalbar)',
+    island: 'SUMATERA',
+    organizer: 'Koalisi Komunitas Save Tree Nusantara & BPBD Daerah',
+    targetAmountRp: 70000000,
+    collectedAmountRp: 43800000,
+    targetTrees: 3500,
+    plantedTrees: 1900,
+    donorCount: 215,
+    imageUrl:
+      'https://images.unsplash.com/photo-1615092296061-e2ccfeb2f3d6?auto=format&fit=crop&w=900&q=80',
+    status: 'PENGGALANGAN_AKTIF',
+    transparencyStage: 2,
+    summary:
+      'Pengiriman paket kesehatan warga terdampak kabut asap (masker N95, tabung oksigen portabel di puskesmas desa) serta restorasi lahan bekas terbakar.',
+    impactReportSummary:
+      'Dana tahap awal Rp 30.000.000 telah diverifikasi oleh Posko Pusat dan sedang didistribusikan dalam bentuk 2.500 masker N95 serta 1.900 bibit pohon Jelutung.',
+    impactReportDate: '10 Nov 2026',
+    breakdown: [
+      { item: '2.500 Masker N95 & 15 Unit Air Purifier Posko Kesehatan Anak', amountRp: 18000000, status: 'TERSALURKAN' },
+      { item: '1.900 Bibit Pohon Jelutung Rawa & Perawatan Lahan', amountRp: 12000000, status: 'TERSALURKAN' },
+      { item: 'Operasional Patroli Sekat Kanal Kemarau', amountRp: 13800000, status: 'DALAM_PROSES' },
+    ],
+  },
+];
+
+export const INITIAL_COMMUNITY_POSTS: CommunityPostData[] = [
+  {
+    id: 'post-01',
+    authorName: 'Tim Audit & Transparansi Pusat GREEN PULSE',
+    authorRole: 'TIM_AUDIT_TRANSPARANSI',
+    locationTag: 'Desa Pulau Padang, Kepulauan Meranti — Riau (Sumatera)',
+    island: 'SUMATERA',
+    category: 'LAPORAN_HASIL_DONASI',
+    title: '[LAPORAN TERLAKSANA 100%] 3 Sumur Bor Aktif & 4.000 Pohon Ramin Telah Ditanam Warga!',
+    content:
+      'Alhamdulillah, donasi masyarakat sebesar Rp 55.000.000 pada kampanye DONASI-RIAU-02 telah 100% tersalurkan melalui Posko Pusat ke MPA Merbau. Sebanyak 3 titik sumur bor artesis kini membasahi sekat kanal Blok A1 sehingga TMA naik kembali dari -64 cm menuju -38 cm, disertai penanaman 4.000 bibit pohon Ramin & Sagu bersama 65 warga lokal.',
+    imageUrl:
+      'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=900&q=80',
+    likes: 128,
+    treesPlantedImpact: 4000,
+    disbursedAmountRp: 55000000,
+    linkedCampaignId: 'camp-02',
+    verifiedAuditCode: 'AUDIT-BRGM-2026-8841',
+    createdAt: '2 jam yang lalu',
+    comments: [
+      {
+        id: 'c-1',
+        authorName: 'Ahmad Syafii (Ketua MPA Pulau Padang)',
+        authorRole: 'Relawan MPA',
+        content:
+          'Terima kasih kepada seluruh donatur! Sumur bor di Blok A1 sangat membantu regu kami memadamkan asap bawah permukaan kemarin sore.',
+        createdAt: '1 jam yang lalu',
+      },
+      {
+        id: 'c-2',
+        authorName: 'Dr. Rina Kusuma (Peneliti Hidrologi Gambut)',
+        authorRole: 'Warga & Akademisi',
+        content:
+          'Transparansi laporan seperti ini sangat bagus, terlihat jelas foto lapangan dan rincian penggunaan dananya.',
+        createdAt: '45 menit yang lalu',
+      },
+    ],
+  },
+  {
+    id: 'post-02',
+    authorName: 'Hendra Kusuma (Koordinator MPA Jabiren Raya)',
+    authorRole: 'RELAWAN_MPA',
+    locationTag: 'KHG Kahayan–Sebangau, Pulang Pisau — Kalimantan Tengah',
+    island: 'KALIMANTAN',
+    category: 'BERITA_BENCANA_TERKINI',
+    title: 'Update Lapangan Kalteng: Pemadaman Titik Asap Blok C & Penyaluran Pompa Tahap I',
+    content:
+      'Siang ini suhu permukaan gambut di Jabiren Raya mencapai 39.4°C dengan TMA -68.4 cm. Berkat bantuan pompa tekanan tinggi dari donasi warga yang diteruskan Posko Pusat, regu Manggala Agni Daops Kalimantan I bersama 18 warga berhasil menyekat perambatan bara api agar tidak masuk ke hutan lindung Sebangau.',
+    imageUrl:
+      'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=900&q=80',
+    likes: 94,
+    treesPlantedImpact: 3850,
+    disbursedAmountRp: 52000000,
+    linkedCampaignId: 'camp-01',
+    verifiedAuditCode: 'AUDIT-BPBD-KT-2026-319',
+    createdAt: '35 menit yang lalu',
+    comments: [
+      {
+        id: 'c-3',
+        authorName: 'Budi Raharjo (Donatur Jakarta)',
+        authorRole: 'Kontributor Save Tree',
+        content:
+          'Semangat terus tim MPA Kalteng & Manggala Agni! Saya baru saja ikut donasi 20 bibit pohon Belangeran untuk Sebangau.',
+        createdAt: '15 menit yang lalu',
+      },
+    ],
+  },
+  {
+    id: 'post-03',
+    authorName: 'Komunitas Save Tree & Relawan Muda Pontianak',
+    authorRole: 'WARGA_LOKAL',
+    locationTag: 'Rasau Jaya, Kab. Kubu Raya — Kalimantan Barat',
+    island: 'KALIMANTAN',
+    category: 'AKSI_SAVE_TREE',
+    title: 'Aksi Akhir Pekan: Penanaman 1.900 Bibit Jelutung Rawa di Lahan Bekas Terbakar Kubu Raya',
+    content:
+      'Pohon Jelutung dan Belangeran adalah kunci menjaga air tanah gambut agar tidak mudah terbakar saat El Nino. Hari ini 45 relawan mahasiswa dan petani Rasau Jaya menanam 1.900 bibit hasil patungan warga di platform GREEN PULSE.',
+    imageUrl:
+      'https://images.unsplash.com/photo-1615092296061-e2ccfeb2f3d6?auto=format&fit=crop&w=900&q=80',
+    likes: 76,
+    treesPlantedImpact: 1900,
+    createdAt: '18 menit yang lalu',
+    comments: [],
+  },
+];
+
+export const INITIAL_TRANSACTIONS: DonationTransactionData[] = [
+  {
+    id: 'tx-01',
+    txCode: 'TX-GP-2026-9041',
+    donorName: 'Andika Pratama (Warga Peduli Gambut)',
+    campaignId: 'camp-01',
+    campaignTitle: 'Darurat Pompa Sekat Kanal & Reboisasi 5.000 Pohon Belangeran KHG Sebangau',
+    amountRp: 500000,
+    treesSponsored: 25,
+    message: 'Semoga tim MPA Kalteng selalu diberi keselamatan dan hutan gambut kita kembali hijau.',
+    paymentMethod: 'QRIS Transparan Pusat',
+    status: 'TERVERIFIKASI_PUBLIK',
+    createdAt: '10 Nov 2026, 07:30 WIB',
+  },
+  {
+    id: 'tx-02',
+    txCode: 'TX-GP-2026-9040',
+    donorName: 'Siti Nurhaliza (Komunitas Hijau Sumatera)',
+    campaignId: 'camp-02',
+    campaignTitle: 'Gerakan 4.000 Pohon Ramin (Save Tree) & Sumur Bor Desa Pulau Padang',
+    amountRp: 250000,
+    treesSponsored: 12,
+    message: 'Titip 12 pohon Ramin untuk Desa Pulau Padang Riau!',
+    paymentMethod: 'Virtual Account Bank Nasional',
+    status: 'TERVERIFIKASI_PUBLIK',
+    createdAt: '10 Nov 2026, 07:12 WIB',
+  },
+  {
+    id: 'tx-03',
+    txCode: 'TX-GP-2026-9039',
+    donorName: 'Hamba Allah (Palangka Raya)',
+    campaignId: 'camp-03',
+    campaignTitle: 'Tanggap Asap & Restorasi Hutan Gambut OKI (Sumsel) & Kubu Raya (Kalbar)',
+    amountRp: 150000,
+    treesSponsored: 7,
+    message: 'Untuk bantuan masker N95 anak-anak di OKI Sumsel & Kubu Raya.',
+    paymentMethod: 'QRIS Transparan Pusat',
+    status: 'TERVERIFIKASI_PUBLIK',
+    createdAt: '10 Nov 2026, 06:55 WIB',
+  },
+];
 
 export function getStoredReports(): CitizenReportData[] {
   if (typeof window === 'undefined') return INITIAL_REPORTS;
@@ -681,6 +968,87 @@ export function saveStoredPatrols(patrols: PatrolScheduleData[]) {
   if (typeof window === 'undefined') return;
   try {
     window.localStorage.setItem(STORAGE_KEYS.PATROLS, JSON.stringify(patrols));
+    window.dispatchEvent(new Event('greenpulse-sync'));
+  } catch {
+    // ignore
+  }
+}
+
+export function getStoredPosts(): CommunityPostData[] {
+  if (typeof window === 'undefined') return INITIAL_COMMUNITY_POSTS;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEYS.COMMUNITY_POSTS);
+    if (!raw) return INITIAL_COMMUNITY_POSTS;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0
+      ? parsed
+      : INITIAL_COMMUNITY_POSTS;
+  } catch {
+    return INITIAL_COMMUNITY_POSTS;
+  }
+}
+
+export function saveStoredPosts(posts: CommunityPostData[]) {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(
+      STORAGE_KEYS.COMMUNITY_POSTS,
+      JSON.stringify(posts),
+    );
+    window.dispatchEvent(new Event('greenpulse-sync'));
+  } catch {
+    // ignore
+  }
+}
+
+export function getStoredCampaigns(): DonationCampaignData[] {
+  if (typeof window === 'undefined') return INITIAL_CAMPAIGNS;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEYS.CAMPAIGNS);
+    if (!raw) return INITIAL_CAMPAIGNS;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0
+      ? parsed
+      : INITIAL_CAMPAIGNS;
+  } catch {
+    return INITIAL_CAMPAIGNS;
+  }
+}
+
+export function saveStoredCampaigns(campaigns: DonationCampaignData[]) {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(
+      STORAGE_KEYS.CAMPAIGNS,
+      JSON.stringify(campaigns),
+    );
+    window.dispatchEvent(new Event('greenpulse-sync'));
+  } catch {
+    // ignore
+  }
+}
+
+export function getStoredTransactions(): DonationTransactionData[] {
+  if (typeof window === 'undefined') return INITIAL_TRANSACTIONS;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEYS.TRANSACTIONS);
+    if (!raw) return INITIAL_TRANSACTIONS;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0
+      ? parsed
+      : INITIAL_TRANSACTIONS;
+  } catch {
+    return INITIAL_TRANSACTIONS;
+  }
+}
+
+export function saveStoredTransactions(txs: DonationTransactionData[]) {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(
+      STORAGE_KEYS.TRANSACTIONS,
+      JSON.stringify(txs),
+    );
     window.dispatchEvent(new Event('greenpulse-sync'));
   } catch {
     // ignore

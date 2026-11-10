@@ -460,6 +460,15 @@ export default function DashboardCommandCenterPage() {
               Simulasi Sensor
             </button>
 
+            {/* Switch to Community News & Save Tree Donation Page */}
+            <Link
+              href="/community"
+              className="px-3.5 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 border border-teal-400/50 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm transition"
+            >
+              <Users className="w-4 h-4 text-emerald-200" />
+              Komunitas & Donasi Save Tree
+            </Link>
+
             {/* Switch to Citizen Mobile App */}
             <Link
               href="/mobile-app"

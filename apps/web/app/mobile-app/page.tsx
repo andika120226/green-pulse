@@ -285,20 +285,20 @@ export default function MobileCitizenAppPage() {
         </header>
 
         {/* Quick Navigation Bar for Mobile Users */}
-        <div className="bg-emerald-800 text-emerald-100 px-4 py-2 flex items-center justify-between text-xs border-b border-emerald-700">
+        <div className="bg-emerald-800 text-emerald-100 px-4 py-2 flex flex-wrap items-center justify-between gap-2 text-xs border-b border-emerald-700">
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-1.5 font-semibold hover:text-white"
+            className="inline-flex items-center gap-1 font-semibold hover:text-white"
           >
             <MapPin className="w-3.5 h-3.5 text-emerald-300" />
-            Lihat Peta WebGIS Penuh
+            Peta WebGIS
           </Link>
           <Link
-            href="/dashboard#community-action-plan"
-            className="inline-flex items-center gap-1.5 font-semibold text-amber-300 hover:text-amber-200"
+            href="/community"
+            className="inline-flex items-center gap-1 font-bold text-amber-300 hover:text-amber-200"
           >
             <Users className="w-3.5 h-3.5" />
-            Usulan Sekat Kanal & Patroli
+            Berita Komunitas & Donasi Save Tree
           </Link>
         </div>
 

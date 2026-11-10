@@ -83,6 +83,14 @@ export default function HomePage() {
             </Link>
 
             <Link
+              href="/community"
+              className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-extrabold text-sm transition shadow-sm"
+            >
+              <Users className="w-5 h-5 text-emerald-200" />
+              Komunitas, Berita & Donasi Save Tree (/community)
+            </Link>
+
+            <Link
               href="/dashboard#community-action-plan"
               className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white hover:bg-emerald-50 border border-emerald-300 text-emerald-950 font-bold text-xs transition shadow-sm"
             >
