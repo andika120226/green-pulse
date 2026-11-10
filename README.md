@@ -9,3 +9,4 @@ Sistem Peringatan Dini dan Mitigasi Kebakaran Hutan dan Lahan Gambut (Karhutla) 
 
 ## Cara Menjalankan Proyek
 Lihat panduan lengkap pada [DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md) dan laporan pengujian pada [QA_SECURITY_TEST_REPORT.md](./QA_SECURITY_TEST_REPORT.md).
+
