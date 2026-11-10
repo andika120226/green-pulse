@@ -30,16 +30,70 @@ import {
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
 
+const HOTSPOT_LOCATIONS = [
+  {
+    label: 'Kalimantan Tengah — KHG Kahayan–Sebangau (Pulang Pisau)',
+    sector: 'Sektor Gambut Jabiren Raya - Pulang Pisau, Kalimantan Tengah',
+    dms: '2°23\'06.0"S 114°04\'55.2"E',
+    lat: -2.385,
+    lon: 114.082,
+    tma: '-68.4 cm',
+    station: 'GP-KAL-01',
+    cluster: 'CLUSTER-KALTENG-01',
+  },
+  {
+    label: 'Kalimantan Barat — KHG Kapuas–Terentang (Kubu Raya)',
+    sector: 'Sektor Gambut Rasau Jaya - Kubu Raya, Kalimantan Barat',
+    dms: '0°14\'42.0"S 109°28\'55.2"E',
+    lat: -0.245,
+    lon: 109.482,
+    tma: '-63.0 cm',
+    station: 'GP-KAL-02',
+    cluster: 'CLUSTER-KALBAR-01',
+  },
+  {
+    label: 'Sumatera (Riau) — KHG Pulau Padang (Kep. Meranti)',
+    sector: 'Sektor Desa Pulau Padang Utara - Kepulauan Meranti, Riau',
+    dms: '0°15\'30.2"N 102°24\'11.8"E',
+    lat: 0.2584,
+    lon: 102.4033,
+    tma: '-64.5 cm',
+    station: 'GP-SUM-01',
+    cluster: 'CLUSTER-RIAU-01',
+  },
+  {
+    label: 'Sumatera Selatan — KHG Sungai Sugihan (OKI)',
+    sector: 'Sektor KHG Sungai Sugihan - Pampangan OKI, Sumatera Selatan',
+    dms: '2°59\'04.2"S 105°19\'15.6"E',
+    lat: -2.9845,
+    lon: 105.321,
+    tma: '-66.2 cm',
+    station: 'GP-SUM-02',
+    cluster: 'CLUSTER-SUMSEL-01',
+  },
+  {
+    label: 'Jambi — KHG Londerang–Sungai Kumpeh (Muaro Jambi)',
+    sector: 'Sektor Gambut Kumpeh - Muaro Jambi, Provinsi Jambi',
+    dms: '1°31\'15.6"S 103°53\'38.4"E',
+    lat: -1.521,
+    lon: 103.894,
+    tma: '-49.8 cm',
+    station: 'GP-SUM-03',
+    cluster: 'CLUSTER-JAMBI-01',
+  },
+];
+
 export default function MobileCitizenAppPage() {
+  const [selectedHotspotIdx, setSelectedHotspotIdx] = useState(0);
+  const activeHotspot = HOTSPOT_LOCATIONS[selectedHotspotIdx];
+
   const [reporterName, setReporterName] = useState(
-    'Ahmad Syafii (Ketua MPA Pulau Padang)',
+    'Hendra Kusuma (MPA Jabiren Raya, Kalteng)',
   );
-  const [reporterPhone, setReporterPhone] = useState('+6285271993812');
-  const [sector, setSector] = useState(
-    'Sektor Desa Pulau Padang Utara (Blok A1)',
-  );
+  const [reporterPhone, setReporterPhone] = useState('+6281349002188');
+  const [sector, setSector] = useState(HOTSPOT_LOCATIONS[0].sector);
   const [description, setDescription] = useState(
-    'Kepulan asap putih pekat berbau gambut menyengat muncul dari bawah permukaan dekat sekat kanal kering GP-KHG-01.',
+    'Kepulan asap putih pekat berbau gambut menyengat muncul dari bawah permukaan dekat sekat kanal kering Eks-PLG Blok C.',
   );
   const [severity, setSeverity] = useState<
     'ASAP_TIPIS' | 'ASAP_PEKAT_GAMBUT' | 'API_TERBUKA'
@@ -54,9 +108,6 @@ export default function MobileCitizenAppPage() {
   const [history, setHistory] = useState<CitizenReportData[]>(INITIAL_REPORTS);
 
   const currentTimestamp = '10 Nov 2026 • 07:15:42 WIB';
-  const dmsCoordinates = `0°15'30.2"N 102°24'11.8"E`;
-  const decimalLat = 0.2584;
-  const decimalLon = 102.4033;
 
   useEffect(() => {
     setHistory(getStoredReports());
@@ -68,6 +119,11 @@ export default function MobileCitizenAppPage() {
       window.removeEventListener('storage', handleSync);
     };
   }, []);
+
+  function handleSelectHotspot(index: number) {
+    setSelectedHotspotIdx(index);
+    setSector(HOTSPOT_LOCATIONS[index].sector);
+  }
 
   function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -95,7 +151,7 @@ export default function MobileCitizenAppPage() {
     setFeedback({
       type: 'success',
       message:
-        'Konfirmasi warga berhasil ditambahkan! Data otomatis tersinkron ke Peta WebGIS Command Center.',
+        'Konfirmasi warga berhasil ditambahkan! Data otomatis tersinkron ke Peta WebGIS Sumatera & Kalimantan.',
     });
   }
 
@@ -108,8 +164,8 @@ export default function MobileCitizenAppPage() {
       reporterPhone,
       sector,
       description,
-      latitude: decimalLat,
-      longitude: decimalLon,
+      latitude: activeHotspot.lat,
+      longitude: activeHotspot.lon,
       gpsAccuracyMeters: 3.2,
       severity,
       isMockLocation,
@@ -136,16 +192,16 @@ export default function MobileCitizenAppPage() {
       reporterPhone,
       sector,
       description,
-      latitude: decimalLat,
-      longitude: decimalLon,
+      latitude: activeHotspot.lat,
+      longitude: activeHotspot.lon,
       gpsAccuracyMeters: 3.2,
       photoUrl,
       exifVerified: true,
       isMockLocation: false,
       severity,
       status: 'VERIFIED',
-      clusterGroupId: 'CLUSTER-KHG01-2026A',
-      dispatchedTeam: 'Regu Manggala Agni Alpha-01 Menuju Lokasi',
+      clusterGroupId: activeHotspot.cluster,
+      dispatchedTeam: 'Regu Manggala Agni & MPA Menuju Lokasi',
       createdAt: 'Baru saja (Live Mobile)',
       communityConfirmations: 1,
     };
@@ -168,7 +224,7 @@ export default function MobileCitizenAppPage() {
     saveStoredReports(updated);
     setFeedback({
       type: 'success',
-      message: `Laporan ${nextCode} diterima Posko BPBD & langsung tampil di Peta WebGIS (Kluster Spasial CLUSTER-KHG01-2026A)!`,
+      message: `Laporan ${nextCode} diterima Posko Satgas Karhutla & langsung tampil di Peta WebGIS (${activeHotspot.cluster})!`,
     });
     setSubmitting(false);
   }
@@ -215,7 +271,7 @@ export default function MobileCitizenAppPage() {
                 GREEN PULSE Citizen
               </h1>
               <span className="text-[11px] font-mono text-emerald-200 block">
-                Masyarakat Peduli Api (MPA) Riau
+                MPA Sumatera & Kalimantan
               </span>
             </div>
           </div>
@@ -253,13 +309,13 @@ export default function MobileCitizenAppPage() {
             <div className="flex items-center justify-between text-[11px] font-mono font-bold text-red-700">
               <span className="flex items-center gap-1.5">
                 <ShieldAlert className="w-4 h-4 text-red-600 animate-bounce" />
-                EARLY WARNING SYSTEM — RADIUS 1.2 KM
+                EARLY WARNING SYSTEM — SUMATERA & KALIMANTAN
               </span>
-              <span>GP-KHG-01</span>
+              <span>{activeHotspot.station}</span>
             </div>
             <p className="text-xs sm:text-sm font-bold text-slate-900 leading-relaxed">
-              PERINGATAN SIAGA: Lahan Gambut Sektor Desa Pulau Padang Kering (TMA
-              -64.5 cm). Dilarang Membuka Lahan dengan Api!
+              PERINGATAN SIAGA: {activeHotspot.sector} Kering (TMA{' '}
+              {activeHotspot.tma}). Dilarang Membuka Lahan dengan Api!
             </p>
           </div>
 
@@ -274,10 +330,10 @@ export default function MobileCitizenAppPage() {
                   Kualitas Udara Lokal (PM2.5)
                 </div>
                 <div className="text-sm sm:text-base font-mono font-extrabold text-orange-700">
-                  ISPU 168 — TIDAK SEHAT
+                  ISPU 184 — TIDAK SEHAT
                 </div>
                 <div className="text-xs text-slate-600 leading-snug">
-                  Gunakan masker N95/KN95. Jalur evakuasi: Posko Desa Merbau.
+                  Gunakan masker N95/KN95 saat beraktivitas di luar ruangan.
                 </div>
               </div>
             </div>
@@ -294,6 +350,24 @@ export default function MobileCitizenAppPage() {
                 <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[10px] font-mono font-bold">
                   Auto-Watermark GPS
                 </span>
+              </div>
+
+              {/* Pilih Wilayah Titik Rawan (Kalimantan / Sumatera) */}
+              <div>
+                <label className="text-xs font-semibold text-slate-700 block mb-1">
+                  Pilih Sektor GPS Titik Rawan (Kalimantan / Sumatera):
+                </label>
+                <select
+                  value={selectedHotspotIdx}
+                  onChange={(e) => handleSelectHotspot(Number(e.target.value))}
+                  className="w-full px-3 py-2.5 rounded-xl bg-emerald-50/70 border border-emerald-300 text-xs font-semibold text-emerald-950 focus:outline-none focus:border-emerald-600"
+                >
+                  {HOTSPOT_LOCATIONS.map((loc, idx) => (
+                    <option key={idx} value={idx}>
+                      {loc.label}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {/* Camera Viewfinder with Automatic Watermark Overlay */}
@@ -322,11 +396,11 @@ export default function MobileCitizenAppPage() {
                     <span>Akurasi GPS: ±3.2m</span>
                   </div>
                   <div className="text-white font-semibold">
-                    KOORDINAT: {dmsCoordinates}
+                    KOORDINAT: {activeHotspot.dms}
                   </div>
                   <div className="text-slate-300 flex items-center justify-between">
                     <span>{currentTimestamp}</span>
-                    <span>TMA Sektor: -64.5 cm</span>
+                    <span>TMA Sektor: {activeHotspot.tma}</span>
                   </div>
                 </div>
               </div>
@@ -389,7 +463,7 @@ export default function MobileCitizenAppPage() {
 
                 <div>
                   <label className="text-xs font-semibold text-slate-700 block mb-1">
-                    Lokasi Sektor Gambut
+                    Lokasi Sektor Gambut (Sumatera / Kalimantan)
                   </label>
                   <input
                     type="text"
@@ -464,7 +538,7 @@ export default function MobileCitizenAppPage() {
             <div className="flex items-center justify-between">
               <span className="text-sm font-extrabold text-emerald-950 flex items-center gap-1.5">
                 <Clock className="w-4 h-4 text-emerald-700" />
-                Laporan Warga Sekitar & Validasi Komunitas
+                Laporan Warga Sumatera & Kalimantan
               </span>
               <span className="text-[11px] font-mono text-emerald-700 font-bold">
                 Live Sync
@@ -485,7 +559,7 @@ export default function MobileCitizenAppPage() {
             </div>
 
             <div className="space-y-2.5 pt-1">
-              {history.slice(0, 3).map((item) => (
+              {history.slice(0, 4).map((item) => (
                 <div
                   key={item.id}
                   className="p-3.5 rounded-xl bg-white border border-emerald-200 text-xs space-y-2 shadow-sm"

@@ -46,7 +46,7 @@ export default function HomePage() {
         <div className="lg:col-span-7 space-y-6">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-100 border border-red-300 text-red-800 text-xs font-mono font-bold">
             <ShieldAlert className="w-4 h-4 text-red-600" />
-            SIAGA DARURAT KARHUTLA GAMBUT — KHG PULAU PADANG & TEBING TINGGI
+            SIAGA DARURAT KARHUTLA GAMBUT — WILAYAH SUMATERA & KALIMANTAN
           </div>
 
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight tracking-tight text-emerald-950">

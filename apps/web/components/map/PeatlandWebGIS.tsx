@@ -7,6 +7,7 @@ import {
   Circle,
   CircleMarker,
   Popup,
+  useMap,
   useMapEvents,
 } from 'react-leaflet';
 import {
@@ -26,6 +27,7 @@ import {
   Droplets,
   MapPin,
   PlusCircle,
+  Compass,
 } from 'lucide-react';
 
 interface PeatlandWebGISProps {
@@ -62,6 +64,20 @@ function MapClickCoordinatePicker({
   return null;
 }
 
+function MapViewportController({
+  center,
+  zoom,
+}: {
+  center: [number, number];
+  zoom: number;
+}) {
+  const map = useMap();
+  React.useEffect(() => {
+    map.flyTo(center, zoom, { duration: 1.1 });
+  }, [center, zoom, map]);
+  return null;
+}
+
 export default function PeatlandWebGIS({
   nodes,
   reports,
@@ -78,13 +94,32 @@ export default function PeatlandWebGIS({
   const [selectedLayer, setSelectedLayer] = useState<'standard' | 'satellite'>(
     'standard',
   );
+  const [regionFocus, setRegionFocus] = useState<
+    'ALL' | 'SUMATERA' | 'KALIMANTAN'
+  >('ALL');
+  const [viewState, setViewState] = useState<{
+    center: [number, number];
+    zoom: number;
+  }>({
+    // Default overview covering both Sumatera & Kalimantan
+    center: [-1.25, 108.8],
+    zoom: 5,
+  });
   const [clickedCoords, setClickedCoords] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
 
-  // Center around KHG Pulau Padang & Pulau Tebing Tinggi, Kepulauan Meranti, Riau
-  const mapCenter: [number, number] = [0.565, 102.61];
+  function handleRegionSwitch(region: 'ALL' | 'SUMATERA' | 'KALIMANTAN') {
+    setRegionFocus(region);
+    if (region === 'ALL') {
+      setViewState({ center: [-1.25, 108.8], zoom: 5 });
+    } else if (region === 'SUMATERA') {
+      setViewState({ center: [-1.2, 103.8], zoom: 6 });
+    } else {
+      setViewState({ center: [-1.8, 112.5], zoom: 6 });
+    }
+  }
 
   function handleMapClick(lat: number, lng: number) {
     setClickedCoords({ lat, lng });
@@ -96,19 +131,19 @@ export default function PeatlandWebGIS({
   return (
     <div className="eco-card rounded-2xl p-4 flex flex-col h-full relative overflow-hidden">
       {/* Header & Interactive Layer Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-3 z-10">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-2.5 z-10">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-100 border border-emerald-300 text-emerald-800 text-[11px] font-mono font-bold">
               <span className="w-2 h-2 rounded-full bg-emerald-600 animate-ping" />
-              INTERACTIVE WEBGIS — KHG RIAU
+              WEBGIS NASIONAL — SUMATERA & KALIMANTAN
             </span>
             <span className="text-xs font-mono text-slate-500">
               Klik pada peta untuk memilih titik koordinat laporan
             </span>
           </div>
           <h3 className="text-base md:text-lg font-extrabold text-emerald-950 mt-0.5">
-            Peta Sebaran Stasiun AIoT, Zona Kerentanan Gambut & Partisipasi Warga
+            Peta Sebaran Titik Rawan Karhutla Gambut Sumatera & Kalimantan
           </h3>
         </div>
 
@@ -168,13 +203,56 @@ export default function PeatlandWebGIS({
         </div>
       </div>
 
+      {/* Quick Region Focus Bar: Sumatera & Kalimantan */}
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5 px-3 py-2 rounded-xl bg-emerald-50/80 border border-emerald-200 text-xs">
+        <span className="font-mono font-bold text-emerald-950 flex items-center gap-1.5">
+          <Compass className="w-4 h-4 text-emerald-700" />
+          Fokus Pantauan Wilayah Rawan Karhutla:
+        </span>
+        <div className="flex flex-wrap items-center gap-1.5 font-mono">
+          <button
+            type="button"
+            onClick={() => handleRegionSwitch('ALL')}
+            className={`px-3 py-1 rounded-lg font-bold transition ${
+              regionFocus === 'ALL'
+                ? 'bg-emerald-800 text-white shadow-sm'
+                : 'bg-white text-emerald-900 border border-emerald-200 hover:bg-emerald-100'
+            }`}
+          >
+            Semua (Sumatera & Kalimantan)
+          </button>
+          <button
+            type="button"
+            onClick={() => handleRegionSwitch('KALIMANTAN')}
+            className={`px-3 py-1 rounded-lg font-bold transition ${
+              regionFocus === 'KALIMANTAN'
+                ? 'bg-red-600 text-white shadow-sm'
+                : 'bg-white text-slate-700 border border-emerald-200 hover:bg-red-50'
+            }`}
+          >
+            🔥 Kalimantan (Kalteng, Kalbar, Kalsel)
+          </button>
+          <button
+            type="button"
+            onClick={() => handleRegionSwitch('SUMATERA')}
+            className={`px-3 py-1 rounded-lg font-bold transition ${
+              regionFocus === 'SUMATERA'
+                ? 'bg-orange-600 text-white shadow-sm'
+                : 'bg-white text-slate-700 border border-emerald-200 hover:bg-orange-50'
+            }`}
+          >
+            🔥 Sumatera (Riau, Sumsel OKI, Jambi)
+          </button>
+        </div>
+      </div>
+
       {/* Clicked Coordinate Interactive Action Strip */}
       {clickedCoords && (
-        <div className="mb-2.5 px-3.5 py-2 rounded-xl bg-emerald-50 border border-emerald-300 flex flex-wrap items-center justify-between gap-2 text-xs">
-          <div className="flex items-center gap-2 font-mono text-emerald-950">
-            <MapPin className="w-4 h-4 text-emerald-700 shrink-0" />
+        <div className="mb-2.5 px-3.5 py-2 rounded-xl bg-amber-50 border border-amber-300 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div className="flex items-center gap-2 font-mono text-amber-950">
+            <MapPin className="w-4 h-4 text-amber-700 shrink-0" />
             <span>
-              Titik Dipilih: <strong>{clickedCoords.lat}°N, {clickedCoords.lng}°E</strong>
+              Titik Dipilih: <strong>{clickedCoords.lat}°, {clickedCoords.lng}°</strong>
             </span>
           </div>
           {onOpenReportModalWithCoords && (
@@ -193,13 +271,17 @@ export default function PeatlandWebGIS({
       )}
 
       {/* Main Map Container */}
-      <div className="relative w-full h-[440px] rounded-xl overflow-hidden border border-emerald-200 shadow-inner">
+      <div className="relative w-full h-[430px] rounded-xl overflow-hidden border border-emerald-200 shadow-inner">
         <MapContainer
-          center={mapCenter}
-          zoom={9}
+          center={viewState.center}
+          zoom={viewState.zoom}
           scrollWheelZoom={true}
           className="w-full h-full z-0"
         >
+          <MapViewportController
+            center={viewState.center}
+            zoom={viewState.zoom}
+          />
           <MapClickCoordinatePicker onMapClick={handleMapClick} />
 
           {/* 100% Free Tile Providers without API Key Requirement */}
@@ -220,14 +302,15 @@ export default function PeatlandWebGIS({
           {/* 1. Render Heatzone Interpolation Circles & Sensor Node Markers */}
           {nodes.map((node) => {
             const color = RISK_COLORS[node.currentRiskStatus] || '#10B981';
+            // Radius scaled so heatzones are clearly visible across Sumatera & Kalimantan
             const heatRadius =
               node.currentRiskStatus === 'KRITIS'
-                ? 5500
+                ? 42000
                 : node.currentRiskStatus === 'SIAGA'
-                ? 4200
+                ? 32000
                 : node.currentRiskStatus === 'WASPADA'
-                ? 3000
-                : 2000;
+                ? 24000
+                : 16000;
 
             return (
               <React.Fragment key={node.id}>
@@ -267,7 +350,7 @@ export default function PeatlandWebGIS({
                       <div className="flex items-center justify-between border-b border-emerald-100 pb-2">
                         <span className="font-mono font-bold text-xs text-emerald-800 flex items-center gap-1">
                           <Radio className="w-3.5 h-3.5 text-emerald-600" />
-                          {node.nodeCode}
+                          {node.nodeCode} ({node.island})
                         </span>
                         <span
                           className="px-2 py-0.5 rounded text-[10px] font-mono font-bold"
@@ -286,7 +369,7 @@ export default function PeatlandWebGIS({
                           {node.name}
                         </div>
                         <div className="text-[11px] text-slate-500">
-                          {node.sector} — Kec. {node.district}
+                          {node.sector} — Prov. {node.province}
                         </div>
                       </div>
 
@@ -330,7 +413,7 @@ export default function PeatlandWebGIS({
                           GPS: {node.latitude.toFixed(4)},{' '}
                           {node.longitude.toFixed(4)}
                         </span>
-                        <span>RSSI: {node.rssiDbm} dBm</span>
+                        <span>PM2.5: {node.lastPm25} µg/m³</span>
                       </div>
                     </div>
                   </Popup>
@@ -348,7 +431,7 @@ export default function PeatlandWebGIS({
               return (
                 <CircleMarker
                   key={rep.id}
-                  center={[rep.latitude + 0.006, rep.longitude + 0.006]}
+                  center={[rep.latitude + 0.04, rep.longitude + 0.04]}
                   radius={9}
                   pathOptions={{
                     color: '#FFFFFF',
@@ -380,8 +463,8 @@ export default function PeatlandWebGIS({
                             GREEN PULSE VERIFIED • ±{rep.gpsAccuracyMeters}m
                           </span>
                           <span className="text-white">
-                            LAT {rep.latitude.toFixed(4)}°N • LON{' '}
-                            {rep.longitude.toFixed(4)}°E
+                            LAT {rep.latitude.toFixed(4)}° • LON{' '}
+                            {rep.longitude.toFixed(4)}°
                           </span>
                         </div>
                       </div>

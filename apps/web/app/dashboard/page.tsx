@@ -74,7 +74,7 @@ export default function DashboardCommandCenterPage() {
   const [patrols, setPatrols] = useState<PatrolScheduleData[]>(INITIAL_PATROLS);
   const [timeSeries, setTimeSeries] =
     useState<TimeSeriesPoint[]>(INITIAL_TIMESERIES);
-  const [selectedNodeCode, setSelectedNodeCode] = useState<string>('GP-KHG-01');
+  const [selectedNodeCode, setSelectedNodeCode] = useState<string>('GP-KAL-01');
   const [broadcastActive, setBroadcastActive] = useState(false);
   const [simulatingPacket, setSimulatingPacket] = useState(false);
   const [statusBanner, setStatusBanner] = useState<string | null>(null);
@@ -87,17 +87,17 @@ export default function DashboardCommandCenterPage() {
   // Modal State for Direct Citizen Fire Report from WebGIS Dashboard
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [modalReporterName, setModalReporterName] = useState(
-    'Budi Santoso (Warga Desa Pulau Padang)',
+    'Hendra Kusuma (Warga Jabiren Raya, Kalteng)',
   );
-  const [modalReporterPhone, setModalReporterPhone] = useState('+6281276543210');
+  const [modalReporterPhone, setModalReporterPhone] = useState('+6281349002188');
   const [modalSector, setModalSector] = useState(
-    'Sektor Kanal Sekat Pulau Padang Utara (Blok A2)',
+    'Sektor Gambut KHG Kahayan–Sebangau (Pulang Pisau, Kalteng)',
   );
   const [modalDescription, setModalDescription] = useState(
-    'Terlihat kepulan asap putih pekat dari lahan gambut kering dekat kebun sagu warga, mohon segera dicek.',
+    'Terlihat kepulan asap putih pekat dari lahan gambut kering dekat kanal Eks-PLG Blok C, mohon segera dicek.',
   );
-  const [modalLat, setModalLat] = useState<number>(0.2612);
-  const [modalLng, setModalLng] = useState<number>(102.4065);
+  const [modalLat, setModalLat] = useState<number>(-2.385);
+  const [modalLng, setModalLng] = useState<number>(114.082);
   const [modalSeverity, setModalSeverity] = useState<
     'ASAP_TIPIS' | 'ASAP_PEKAT_GAMBUT' | 'API_TERBUKA'
   >('ASAP_PEKAT_GAMBUT');
@@ -195,14 +195,14 @@ export default function DashboardCommandCenterPage() {
 
     setNodes((prev) =>
       prev.map((n) =>
-        n.nodeCode === 'GP-KHG-01'
+        n.nodeCode === 'GP-KAL-01' || n.nodeCode === 'GP-SUM-01'
           ? {
               ...n,
               lastWaterLevelTMA: nextTma,
               lastSoilMoisture10cm: nextMoisture,
               lastSurfaceTemp: nextTemp,
               currentRiskStatus: 'KRITIS',
-              predictedRiskScore: 95.1,
+              predictedRiskScore: 96.8,
               lastSeenAt: 'Baru saja (Live TX)',
             }
           : n,
@@ -216,13 +216,13 @@ export default function DashboardCommandCenterPage() {
         waterLevelTMA: nextTma,
         soilMoisture10cm: nextMoisture,
         surfaceTemp: nextTemp,
-        predictedRiskScore: 95.1,
+        predictedRiskScore: 96.8,
       };
       return copy;
     });
 
     setStatusBanner(
-      `Paket LoRaWAN GP-KHG-01 Diterima: TMA ${nextTma} cm | Kelembaban ${nextMoisture}% | Suhu ${nextTemp}°C -> Status KRITIS (Skor AI: 95.1%)`,
+      `Paket LoRaWAN Sumatera & Kalimantan Diterima: TMA ${nextTma} cm | Kelembaban ${nextMoisture}% | Suhu ${nextTemp}°C -> Status KRITIS (Skor AI: 96.8%)`,
     );
     setSimulatingPacket(false);
   }
@@ -776,7 +776,7 @@ export default function DashboardCommandCenterPage() {
                   JARINGAN TELEMETRI AIOT LORAWAN
                 </span>
                 <h3 className="text-base md:text-lg font-extrabold text-emerald-950">
-                  Status Stasiun Sensor KHG Riau
+                  Status Stasiun Sensor Sumatera & Kalimantan
                 </h3>
               </div>
               <span className="px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 font-mono text-xs font-semibold">
