@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'GREEN PULSE — AIoT Peatland Wildfire Command Center & WebGIS',
+  title: 'GREEN PULSE — AIoT Peatland Wildfire Command Center & Community WebGIS',
   description:
-    'Sistem Peringatan Dini dan Mitigasi Kebakaran Hutan dan Lahan Gambut (Karhutla) Berbasis AIoT, WebGIS & Mobile Crowdsourcing (BRGM Standards)',
+    'Sistem Peringatan Dini dan Mitigasi Partisipatif Kebakaran Hutan dan Lahan Gambut (Karhutla) Berbasis AIoT, WebGIS & Crowdsourcing Masyarakat (Standar BRGM)',
 };
 
 export default function RootLayout({
@@ -13,12 +13,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id" className="dark">
+    <html lang="id">
       <head>
-        <link
-          rel="preconnect"
-          href="https://fonts.googleapis.com"
-        />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
           href="https://fonts.gstatic.com"
@@ -29,10 +26,9 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen bg-forest-slate text-moss-white antialiased selection:bg-pulse-emerald selection:text-forest-slate">
+      <body className="min-h-screen bg-[#F0F7F4] bg-gradient-to-br from-emerald-50 via-teal-50/40 to-white text-slate-800 antialiased selection:bg-emerald-600 selection:text-white">
         {children}
       </body>
     </html>
   );
 }
-

@@ -1,7 +1,6 @@
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
-  darkMode: ['class'],
   content: [
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -10,16 +9,15 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Eco-Pulse Tactical Palette (Skill Agent 04)
-        forest: {
-          slate: '#07120E',
-          panel: '#0C1E17',
-          border: '#163529',
-          muted: '#1E4637',
-        },
-        moss: {
-          white: '#F3F8F5',
-          soft: '#E2EFE8',
+        // Eco-Fresh Botanical & Clean Emerald Palette
+        botanical: {
+          bg: '#F0F7F4',
+          surface: '#FFFFFF',
+          mint: '#E6F4EE',
+          border: '#BBF7D0',
+          header: '#064E3B',
+          text: '#0F172A',
+          muted: '#475569',
         },
         pulse: {
           emerald: '#10B981', // Status Aman
@@ -33,12 +31,10 @@ const config: Config = {
         mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
       },
       boxShadow: {
-        'crimson-glow': '0 0 25px -2px rgba(239, 68, 68, 0.55)',
-        'emerald-glow': '0 0 20px -4px rgba(16, 185, 129, 0.45)',
-        'tactical-glass': '0 8px 32px 0 rgba(4, 15, 11, 0.65)',
-      },
-      animation: {
-        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'eco-card': '0 4px 20px -2px rgba(6, 78, 59, 0.07), 0 1px 4px -1px rgba(6, 78, 59, 0.04)',
+        'eco-hover': '0 10px 28px -4px rgba(16, 185, 129, 0.14)',
+        'crimson-glow': '0 4px 20px -2px rgba(239, 68, 68, 0.35)',
+        'emerald-glow': '0 4px 18px -2px rgba(16, 185, 129, 0.3)',
       },
     },
   },
@@ -46,4 +42,3 @@ const config: Config = {
 };
 
 export default config;
-

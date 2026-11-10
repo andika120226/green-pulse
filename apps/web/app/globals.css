@@ -5,42 +5,41 @@
 @import 'leaflet/dist/leaflet.css';
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
-  background-color: #07120E;
-  color: #F3F8F5;
+  background-color: #F0F7F4;
+  color: #0F172A;
   font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
 }
 
-.tactical-glass {
-  background: rgba(12, 30, 23, 0.78);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(16, 185, 129, 0.22);
+.eco-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(167, 243, 208, 0.85);
+  box-shadow: 0 4px 20px -2px rgba(6, 78, 59, 0.06), 0 1px 3px 0 rgba(6, 78, 59, 0.04);
 }
 
-.tactical-glass-crimson {
-  background: rgba(28, 12, 14, 0.82);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(239, 68, 68, 0.48);
-  box-shadow: 0 0 28px -4px rgba(239, 68, 68, 0.35);
+.eco-card-crimson {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FEF2F2 100%);
+  border: 1px solid rgba(252, 165, 165, 0.9);
+  box-shadow: 0 6px 22px -4px rgba(239, 68, 68, 0.15);
 }
 
-/* Custom Leaflet Dark Tactical Popup Styling */
+/* Custom Leaflet Clean Botanical Popup Styling */
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
-  background: #0C1E17 !important;
-  color: #F3F8F5 !important;
-  border: 1px solid rgba(16, 185, 129, 0.35);
-  border-radius: 12px !important;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.75) !important;
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  border: 1px solid #A7F3D0;
+  border-radius: 14px !important;
+  box-shadow: 0 12px 28px rgba(6, 78, 59, 0.16) !important;
 }
 
 .leaflet-container {
-  background: #06100C !important;
+  background: #E6F4EE !important;
   font-family: 'Plus Jakarta Sans', sans-serif !important;
 }
-

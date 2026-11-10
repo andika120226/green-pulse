@@ -7,8 +7,13 @@ import {
   Circle,
   CircleMarker,
   Popup,
+  useMapEvents,
 } from 'react-leaflet';
-import { SensorNodeData, CitizenReportData } from '@/lib/mock-data';
+import {
+  SensorNodeData,
+  CitizenReportData,
+  CommunityProposalData,
+} from '@/lib/mock-data';
 import {
   Flame,
   Radio,
@@ -17,13 +22,21 @@ import {
   Camera,
   CheckCircle2,
   Layers,
+  ThumbsUp,
+  Droplets,
+  MapPin,
+  PlusCircle,
 } from 'lucide-react';
 
 interface PeatlandWebGISProps {
   nodes: SensorNodeData[];
   reports: CitizenReportData[];
+  proposals?: CommunityProposalData[];
   onVerifyAndDispatch: (reportId: string) => void;
+  onConfirmReport?: (reportId: string) => void;
   onSelectNode?: (nodeCode: string) => void;
+  onPickMapCoordinates?: (lat: number, lng: number) => void;
+  onOpenReportModalWithCoords?: (lat: number, lng: number) => void;
 }
 
 const RISK_COLORS: Record<SensorNodeData['currentRiskStatus'], string> = {
@@ -33,46 +46,80 @@ const RISK_COLORS: Record<SensorNodeData['currentRiskStatus'], string> = {
   KRITIS: '#EF4444',
 };
 
+function MapClickCoordinatePicker({
+  onMapClick,
+}: {
+  onMapClick: (lat: number, lng: number) => void;
+}) {
+  useMapEvents({
+    click(e) {
+      onMapClick(
+        Number(e.latlng.lat.toFixed(4)),
+        Number(e.latlng.lng.toFixed(4)),
+      );
+    },
+  });
+  return null;
+}
+
 export default function PeatlandWebGIS({
   nodes,
   reports,
+  proposals = [],
   onVerifyAndDispatch,
+  onConfirmReport,
   onSelectNode,
+  onPickMapCoordinates,
+  onOpenReportModalWithCoords,
 }: PeatlandWebGISProps) {
   const [showHeatzones, setShowHeatzones] = useState(true);
   const [showReports, setShowReports] = useState(true);
-  const [selectedLayer, setSelectedLayer] = useState<'dark' | 'satellite'>('dark');
+  const [showProposals, setShowProposals] = useState(true);
+  const [selectedLayer, setSelectedLayer] = useState<'standard' | 'satellite'>(
+    'standard',
+  );
+  const [clickedCoords, setClickedCoords] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
 
   // Center around KHG Pulau Padang & Pulau Tebing Tinggi, Kepulauan Meranti, Riau
   const mapCenter: [number, number] = [0.565, 102.61];
 
+  function handleMapClick(lat: number, lng: number) {
+    setClickedCoords({ lat, lng });
+    if (onPickMapCoordinates) {
+      onPickMapCoordinates(lat, lng);
+    }
+  }
+
   return (
-    <div className="tactical-glass rounded-2xl p-4 flex flex-col h-full relative overflow-hidden">
-      {/* Header & Layer Controls */}
+    <div className="eco-card rounded-2xl p-4 flex flex-col h-full relative overflow-hidden">
+      {/* Header & Interactive Layer Controls */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-3 z-10">
         <div>
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-pulse-emerald/15 border border-pulse-emerald/40 text-pulse-emerald text-[11px] font-mono font-bold">
-              <span className="w-1.5 h-1.5 rounded-full bg-pulse-emerald animate-ping" />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-100 border border-emerald-300 text-emerald-800 text-[11px] font-mono font-bold">
+              <span className="w-2 h-2 rounded-full bg-emerald-600 animate-ping" />
               INTERACTIVE WEBGIS — KHG RIAU
             </span>
-            <span className="text-xs font-mono text-moss-white/60">
-              EPSG:4326 | Spatial Clustering DBSCAN 500m
+            <span className="text-xs font-mono text-slate-500">
+              Klik pada peta untuk memilih titik koordinat laporan
             </span>
           </div>
-          <h3 className="text-base md:text-lg font-bold text-moss-white mt-0.5">
-            Peta Sebaran Stasiun AIoT LoRaWAN, Zona Panas Gambut & Titik Laporan Warga
+          <h3 className="text-base md:text-lg font-extrabold text-emerald-950 mt-0.5">
+            Peta Sebaran Stasiun AIoT, Zona Kerentanan Gambut & Partisipasi Warga
           </h3>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
+        <div className="flex flex-wrap items-center gap-1.5 text-xs font-mono">
           <button
             type="button"
             onClick={() => setShowHeatzones((v) => !v)}
             className={`px-2.5 py-1.5 rounded-lg border transition flex items-center gap-1.5 ${
               showHeatzones
-                ? 'bg-pulse-crimson/20 border-pulse-crimson text-pulse-crimson font-semibold'
-                : 'bg-forest-slate/70 border-forest-border text-moss-white/60'
+                ? 'bg-red-50 border-red-400 text-red-700 font-bold shadow-sm'
+                : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
             }`}
           >
             <Flame className="w-3.5 h-3.5" />
@@ -83,8 +130,8 @@ export default function PeatlandWebGIS({
             onClick={() => setShowReports((v) => !v)}
             className={`px-2.5 py-1.5 rounded-lg border transition flex items-center gap-1.5 ${
               showReports
-                ? 'bg-pulse-amber/20 border-pulse-amber text-pulse-amber font-semibold'
-                : 'bg-forest-slate/70 border-forest-border text-moss-white/60'
+                ? 'bg-amber-50 border-amber-400 text-amber-800 font-bold shadow-sm'
+                : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
             }`}
           >
             <Camera className="w-3.5 h-3.5" />
@@ -92,32 +139,79 @@ export default function PeatlandWebGIS({
           </button>
           <button
             type="button"
-            onClick={() =>
-              setSelectedLayer((l) => (l === 'dark' ? 'satellite' : 'dark'))
-            }
-            className="px-2.5 py-1.5 rounded-lg bg-forest-slate/80 border border-forest-border text-moss-white/80 hover:border-pulse-emerald/50 transition flex items-center gap-1.5"
+            onClick={() => setShowProposals((v) => !v)}
+            className={`px-2.5 py-1.5 rounded-lg border transition flex items-center gap-1.5 ${
+              showProposals
+                ? 'bg-teal-50 border-teal-400 text-teal-800 font-bold shadow-sm'
+                : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+            }`}
           >
-            <Layers className="w-3.5 h-3.5 text-pulse-emerald" />
-            {selectedLayer === 'dark' ? 'Peta Satelit' : 'Peta Komando'}
+            <Droplets className="w-3.5 h-3.5" />
+            Usulan Sekat/Sumur ({proposals.length})
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              setSelectedLayer((l) =>
+                l === 'standard' ? 'satellite' : 'standard',
+              )
+            }
+            className={`px-3 py-1.5 rounded-lg border transition flex items-center gap-1.5 font-bold ${
+              selectedLayer === 'satellite'
+                ? 'bg-emerald-900 border-emerald-950 text-white shadow-sm'
+                : 'bg-emerald-50 border-emerald-300 text-emerald-900 hover:bg-emerald-100'
+            }`}
+          >
+            <Layers className="w-3.5 h-3.5" />
+            {selectedLayer === 'standard' ? 'Peta Satelit' : 'Peta Standar'}
           </button>
         </div>
       </div>
 
+      {/* Clicked Coordinate Interactive Action Strip */}
+      {clickedCoords && (
+        <div className="mb-2.5 px-3.5 py-2 rounded-xl bg-emerald-50 border border-emerald-300 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div className="flex items-center gap-2 font-mono text-emerald-950">
+            <MapPin className="w-4 h-4 text-emerald-700 shrink-0" />
+            <span>
+              Titik Dipilih: <strong>{clickedCoords.lat}°N, {clickedCoords.lng}°E</strong>
+            </span>
+          </div>
+          {onOpenReportModalWithCoords && (
+            <button
+              type="button"
+              onClick={() =>
+                onOpenReportModalWithCoords(clickedCoords.lat, clickedCoords.lng)
+              }
+              className="px-3 py-1 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold flex items-center gap-1.5 transition shadow-sm"
+            >
+              <PlusCircle className="w-3.5 h-3.5" />
+              Lapor Titik Api di Koordinat Ini
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Main Map Container */}
-      <div className="relative w-full h-[430px] rounded-xl overflow-hidden border border-forest-border">
+      <div className="relative w-full h-[440px] rounded-xl overflow-hidden border border-emerald-200 shadow-inner">
         <MapContainer
           center={mapCenter}
           zoom={9}
           scrollWheelZoom={true}
           className="w-full h-full z-0"
         >
-          {selectedLayer === 'dark' ? (
+          <MapClickCoordinatePicker onMapClick={handleMapClick} />
+
+          {/* 100% Free Tile Providers without API Key Requirement */}
+          {selectedLayer === 'standard' ? (
             <TileLayer
-              attribution='&copy; <a href="https://carto.com/">CARTO</a> Tactical Dark'
-              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+              key="osm-standard"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
           ) : (
             <TileLayer
+              key="esri-satellite"
               attribution='&copy; Esri World Imagery'
               url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
             />
@@ -145,8 +239,8 @@ export default function PeatlandWebGIS({
                       color,
                       fillColor: color,
                       fillOpacity:
-                        node.currentRiskStatus === 'KRITIS' ? 0.28 : 0.16,
-                      weight: 1.5,
+                        node.currentRiskStatus === 'KRITIS' ? 0.28 : 0.18,
+                      weight: 2,
                       dashArray:
                         node.currentRiskStatus === 'KRITIS' ? undefined : '6 4',
                     }}
@@ -157,7 +251,7 @@ export default function PeatlandWebGIS({
                   center={[node.latitude, node.longitude]}
                   radius={node.currentRiskStatus === 'KRITIS' ? 11 : 9}
                   pathOptions={{
-                    color: '#07120E',
+                    color: '#FFFFFF',
                     weight: 2.5,
                     fillColor: color,
                     fillOpacity: 0.95,
@@ -168,17 +262,17 @@ export default function PeatlandWebGIS({
                     },
                   }}
                 >
-                  <Popup className="tactical-popup">
-                    <div className="w-64 space-y-2.5 text-moss-white p-1">
-                      <div className="flex items-center justify-between border-b border-forest-border pb-2">
-                        <span className="font-mono font-bold text-xs text-pulse-emerald flex items-center gap-1">
-                          <Radio className="w-3.5 h-3.5" />
+                  <Popup>
+                    <div className="w-64 space-y-2.5 text-slate-800 p-1">
+                      <div className="flex items-center justify-between border-b border-emerald-100 pb-2">
+                        <span className="font-mono font-bold text-xs text-emerald-800 flex items-center gap-1">
+                          <Radio className="w-3.5 h-3.5 text-emerald-600" />
                           {node.nodeCode}
                         </span>
                         <span
                           className="px-2 py-0.5 rounded text-[10px] font-mono font-bold"
                           style={{
-                            backgroundColor: `${color}25`,
+                            backgroundColor: `${color}20`,
                             color,
                             border: `1px solid ${color}`,
                           }}
@@ -188,53 +282,53 @@ export default function PeatlandWebGIS({
                       </div>
 
                       <div>
-                        <div className="font-bold text-sm">{node.name}</div>
-                        <div className="text-[11px] text-moss-white/60">
+                        <div className="font-bold text-sm text-emerald-950">
+                          {node.name}
+                        </div>
+                        <div className="text-[11px] text-slate-500">
                           {node.sector} — Kec. {node.district}
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-1.5 font-mono text-xs bg-forest-slate/90 p-2 rounded-lg border border-forest-border">
+                      <div className="grid grid-cols-2 gap-1.5 font-mono text-xs bg-emerald-50/70 p-2.5 rounded-lg border border-emerald-200/80">
                         <div>
-                          <span className="text-[10px] text-moss-white/50 block">
+                          <span className="text-[10px] text-slate-500 block">
                             TMA Gambut
                           </span>
-                          <span
-                            className="font-bold"
-                            style={{ color }}
-                          >
+                          <span className="font-bold" style={{ color }}>
                             {node.lastWaterLevelTMA} cm
                           </span>
                         </div>
                         <div>
-                          <span className="text-[10px] text-moss-white/50 block">
+                          <span className="text-[10px] text-slate-500 block">
                             Kelembaban 10cm
                           </span>
-                          <span className="font-bold text-moss-white">
+                          <span className="font-bold text-slate-800">
                             {node.lastSoilMoisture10cm}%
                           </span>
                         </div>
                         <div>
-                          <span className="text-[10px] text-moss-white/50 block">
+                          <span className="text-[10px] text-slate-500 block">
                             Suhu Permukaan
                           </span>
-                          <span className="font-bold text-pulse-ember">
+                          <span className="font-bold text-orange-600">
                             {node.lastSurfaceTemp}°C
                           </span>
                         </div>
                         <div>
-                          <span className="text-[10px] text-moss-white/50 block">
+                          <span className="text-[10px] text-slate-500 block">
                             Skor AI XGBoost
                           </span>
-                          <span className="font-bold text-pulse-crimson">
+                          <span className="font-bold text-red-600">
                             {node.predictedRiskScore}%
                           </span>
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between text-[10px] font-mono text-moss-white/60 pt-1">
+                      <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 pt-1">
                         <span>
-                          GPS: {node.latitude.toFixed(4)}, {node.longitude.toFixed(4)}
+                          GPS: {node.latitude.toFixed(4)},{' '}
+                          {node.longitude.toFixed(4)}
                         </span>
                         <span>RSSI: {node.rssiDbm} dBm</span>
                       </div>
@@ -249,43 +343,43 @@ export default function PeatlandWebGIS({
           {showReports &&
             reports.map((rep) => {
               const isDispatched = rep.status === 'DISPATCHED';
-              const pinColor = isDispatched ? '#10B981' : '#F59E0B';
+              const pinColor = isDispatched ? '#059669' : '#D97706';
 
               return (
                 <CircleMarker
                   key={rep.id}
-                  center={[rep.latitude + 0.008, rep.longitude + 0.008]}
-                  radius={8}
+                  center={[rep.latitude + 0.006, rep.longitude + 0.006]}
+                  radius={9}
                   pathOptions={{
                     color: '#FFFFFF',
-                    weight: 2,
+                    weight: 2.5,
                     fillColor: pinColor,
                     fillOpacity: 0.95,
                   }}
                 >
                   <Popup>
-                    <div className="w-72 space-y-2.5 text-moss-white p-1">
-                      <div className="flex items-center justify-between border-b border-forest-border pb-1.5">
-                        <span className="font-mono font-bold text-xs text-pulse-amber">
+                    <div className="w-72 space-y-2.5 text-slate-800 p-1">
+                      <div className="flex items-center justify-between border-b border-emerald-100 pb-1.5">
+                        <span className="font-mono font-bold text-xs text-amber-700">
                           {rep.reportCode}
                         </span>
-                        <span className="px-2 py-0.5 rounded bg-pulse-emerald/20 border border-pulse-emerald/40 text-pulse-emerald text-[10px] font-mono">
-                          EXIF & Anti-Mock Verified
+                        <span className="px-2 py-0.5 rounded bg-emerald-100 border border-emerald-300 text-emerald-800 text-[10px] font-mono font-semibold">
+                          EXIF & Anti-Mock OK
                         </span>
                       </div>
 
                       {/* Visual Smoke Proof Thumbnail with Watermark */}
-                      <div className="relative h-28 w-full rounded-lg overflow-hidden border border-forest-border bg-forest-slate">
+                      <div className="relative h-28 w-full rounded-lg overflow-hidden border border-emerald-200 bg-slate-100">
                         <img
                           src={rep.photoUrl}
                           alt={rep.sector}
-                          className="w-full h-full object-cover opacity-85"
+                          className="w-full h-full object-cover"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-2 font-mono text-[9px]">
-                          <span className="text-pulse-emerald font-bold">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent flex flex-col justify-end p-2 font-mono text-[9px]">
+                          <span className="text-emerald-300 font-bold">
                             GREEN PULSE VERIFIED • ±{rep.gpsAccuracyMeters}m
                           </span>
-                          <span className="text-moss-white/90">
+                          <span className="text-white">
                             LAT {rep.latitude.toFixed(4)}°N • LON{' '}
                             {rep.longitude.toFixed(4)}°E
                           </span>
@@ -293,37 +387,58 @@ export default function PeatlandWebGIS({
                       </div>
 
                       <div>
-                        <div className="font-bold text-xs">{rep.sector}</div>
-                        <p className="text-[11px] text-moss-white/75 mt-0.5 line-clamp-2">
+                        <div className="font-bold text-xs text-emerald-950">
+                          {rep.sector}
+                        </div>
+                        <p className="text-[11px] text-slate-600 mt-0.5 leading-snug">
                           &ldquo;{rep.description}&rdquo;
                         </p>
                       </div>
 
-                      <div className="text-[10px] font-mono bg-forest-slate/90 p-2 rounded border border-forest-border space-y-0.5">
+                      <div className="text-[10px] font-mono bg-emerald-50/70 p-2 rounded-lg border border-emerald-200 space-y-0.5 text-slate-700">
                         <div>
-                          Pelapor: <strong className="text-moss-white">{rep.reporterName}</strong>
+                          Pelapor:{' '}
+                          <strong className="text-emerald-950">
+                            {rep.reporterName}
+                          </strong>
                         </div>
                         <div>
                           Kluster Spasial:{' '}
-                          <strong className="text-pulse-amber">{rep.clusterGroupId}</strong>
+                          <strong className="text-amber-700">
+                            {rep.clusterGroupId}
+                          </strong>
                         </div>
                         <div>
-                          Status:{' '}
-                          <strong className="text-pulse-emerald">{rep.status}</strong>
+                          Konfirmasi Warga Sekitar:{' '}
+                          <strong className="text-emerald-700">
+                            {rep.communityConfirmations || 1} Warga
+                          </strong>
                         </div>
                       </div>
+
+                      {onConfirmReport && (
+                        <button
+                          type="button"
+                          onClick={() => onConfirmReport(rep.id)}
+                          className="w-full py-1.5 px-2.5 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 font-bold text-[11px] flex items-center justify-center gap-1.5 transition"
+                        >
+                          <ThumbsUp className="w-3.5 h-3.5 text-amber-700" />
+                          Saya Juga Melihat Asap Ini (+
+                          {rep.communityConfirmations || 1})
+                        </button>
+                      )}
 
                       {rep.status !== 'DISPATCHED' ? (
                         <button
                           type="button"
                           onClick={() => onVerifyAndDispatch(rep.id)}
-                          className="w-full py-2 px-3 rounded-lg bg-pulse-crimson hover:bg-pulse-crimson/90 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-crimson-glow transition"
+                          className="w-full py-2 px-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition"
                         >
                           <Navigation className="w-3.5 h-3.5" />
                           Verifikasi & Terjunkan Manggala Agni
                         </button>
                       ) : (
-                        <div className="w-full py-1.5 px-2.5 rounded-lg bg-pulse-emerald/20 border border-pulse-emerald/40 text-pulse-emerald font-mono text-[11px] flex items-center justify-center gap-1.5">
+                        <div className="w-full py-1.5 px-2.5 rounded-lg bg-emerald-100 border border-emerald-300 text-emerald-800 font-mono text-[11px] font-semibold flex items-center justify-center gap-1.5">
                           <CheckCircle2 className="w-3.5 h-3.5" />
                           {rep.dispatchedTeam || 'Manggala Agni Diterjunkan'}
                         </div>
@@ -333,30 +448,83 @@ export default function PeatlandWebGIS({
                 </CircleMarker>
               );
             })}
+
+          {/* 3. Render Community Proposed Canal Blocks / Boreholes */}
+          {showProposals &&
+            proposals.map((prop) => (
+              <CircleMarker
+                key={prop.id}
+                center={[prop.latitude, prop.longitude]}
+                radius={7}
+                pathOptions={{
+                  color: '#FFFFFF',
+                  weight: 2,
+                  fillColor: '#0D9488',
+                  fillOpacity: 0.95,
+                }}
+              >
+                <Popup>
+                  <div className="w-60 space-y-1.5 text-slate-800 p-1">
+                    <div className="flex items-center justify-between border-b border-teal-100 pb-1">
+                      <span className="font-mono font-bold text-[11px] text-teal-800">
+                        {prop.proposalCode}
+                      </span>
+                      <span className="px-1.5 py-0.5 rounded bg-teal-100 text-teal-800 font-mono text-[10px] font-bold">
+                        {prop.infrastructureType.replace(/_/g, ' ')}
+                      </span>
+                    </div>
+                    <div className="font-bold text-xs text-emerald-950">
+                      {prop.villageName}
+                    </div>
+                    <p className="text-[11px] text-slate-600 leading-snug">
+                      {prop.reason}
+                    </p>
+                    <div className="text-[10px] font-mono text-teal-800 pt-1 border-t border-teal-100 flex justify-between">
+                      <span>Pengusul: {prop.proposerName}</span>
+                      <strong>👍 {prop.votes} Dukungan</strong>
+                    </div>
+                  </div>
+                </Popup>
+              </CircleMarker>
+            ))}
+
+          {/* 4. Render Clicked Coordinate Marker */}
+          {clickedCoords && (
+            <CircleMarker
+              center={[clickedCoords.lat, clickedCoords.lng]}
+              radius={8}
+              pathOptions={{
+                color: '#064E3B',
+                weight: 2.5,
+                fillColor: '#10B981',
+                fillOpacity: 1,
+              }}
+            />
+          )}
         </MapContainer>
 
-        {/* Floating Tactical Legend Overlay */}
-        <div className="absolute bottom-3 left-3 z-[400] tactical-glass p-3 rounded-xl text-[11px] font-mono space-y-1.5 max-w-xs">
-          <div className="font-bold text-moss-white flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5 text-pulse-emerald" />
+        {/* Floating Clean Botanical Legend Overlay */}
+        <div className="absolute bottom-3 left-3 z-[400] bg-white/95 backdrop-blur-md border border-emerald-200 shadow-lg p-3 rounded-xl text-[11px] font-mono space-y-1.5 max-w-xs text-slate-700">
+          <div className="font-bold text-emerald-950 flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
             LEGENDA STATUS TMA GAMBUT (BRGM)
           </div>
           <div className="grid grid-cols-2 gap-x-3 gap-y-1">
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-pulse-emerald inline-block" />
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
               <span>AMAN (&gt; -20cm)</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-pulse-amber inline-block" />
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" />
               <span>WASPADA (-20..-40)</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-pulse-ember inline-block" />
+              <span className="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block" />
               <span>SIAGA (-40..-60)</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-pulse-crimson animate-ping inline-block" />
-              <span className="text-pulse-crimson font-bold">KRITIS (&le; -60cm)</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping inline-block" />
+              <span className="text-red-600 font-bold">KRITIS (&le; -60cm)</span>
             </div>
           </div>
         </div>
@@ -364,4 +532,3 @@ export default function PeatlandWebGIS({
     </div>
   );
 }
-

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-// Zod Validation Schema for Citizen Report Form (Skill Agent 06)
+// Zod Validation Schema for Citizen Report Form
 export const CitizenReportSchema = z.object({
   reporterName: z
     .string()
@@ -75,6 +75,36 @@ export interface CitizenReportData {
   verifiedBy?: string | null;
   verifiedAt?: string | null;
   createdAt: string;
+  communityConfirmations: number;
+}
+
+export interface CommunityProposalData {
+  id: string;
+  proposalCode: string;
+  proposerName: string;
+  villageName: string;
+  infrastructureType: 'SEKAT_KANAL' | 'SUMUR_BOR' | 'EMBUNG_AIR';
+  latitude: number;
+  longitude: number;
+  urgency: 'TINGGI' | 'SEDANG' | 'RENCANA_DESA';
+  reason: string;
+  votes: number;
+  status: 'DIUSULKAN_WARGA' | 'DIKAJI_BRGM' | 'DISETUJUI';
+  createdAt: string;
+}
+
+export interface PatrolScheduleData {
+  id: string;
+  teamName: string;
+  coordinatorName: string;
+  phone: string;
+  sectorRoute: string;
+  scheduleDate: string;
+  shiftTime: 'PAGI (07:00-12:00)' | 'SIANG (12:00-17:00)' | 'SORE/MALAM (17:00-22:00)';
+  waterSourceStatus: 'MELIMPAH' | 'MENYUSUT_WASPADA' | 'KERING_KRITIS';
+  personnelCount: number;
+  equipmentNotes: string;
+  createdAt: string;
 }
 
 export interface TimeSeriesPoint {
@@ -89,6 +119,21 @@ export interface TimeSeriesPoint {
   predictedRiskScore: number;
   brgmLimit: number;
 }
+
+export const SAMPLE_FIELD_PHOTOS = [
+  {
+    label: 'Asap Pekat Sekat Kanal Gambut',
+    url: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    label: 'Bara Api Semak Pakis Kering',
+    url: 'https://images.unsplash.com/photo-1615092296061-e2ccfeb2f3d6?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    label: 'Asap Tipis Kebun Sagu Warga',
+    url: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=800&q=80',
+  },
+];
 
 export const INITIAL_NODES: SensorNodeData[] = [
   {
@@ -240,7 +285,8 @@ export const INITIAL_REPORTS: CitizenReportData[] = [
     latitude: 0.2584,
     longitude: 102.4033,
     gpsAccuracyMeters: 3.2,
-    photoUrl: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=600&q=80',
+    photoUrl:
+      'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=600&q=80',
     exifVerified: true,
     isMockLocation: false,
     severity: 'ASAP_PEKAT_GAMBUT',
@@ -250,6 +296,7 @@ export const INITIAL_REPORTS: CitizenReportData[] = [
     verifiedBy: 'Komandan Posko BPBD Riau',
     verifiedAt: '10 Nov 2026, 06:58 WIB',
     createdAt: '10 Nov 2026, 06:54 WIB',
+    communityConfirmations: 14,
   },
   {
     id: 'rep-002',
@@ -262,7 +309,8 @@ export const INITIAL_REPORTS: CitizenReportData[] = [
     latitude: 0.2595,
     longitude: 102.4042,
     gpsAccuracyMeters: 4.1,
-    photoUrl: 'https://images.unsplash.com/photo-1615092296061-e2ccfeb2f3d6?auto=format&fit=crop&w=600&q=80',
+    photoUrl:
+      'https://images.unsplash.com/photo-1615092296061-e2ccfeb2f3d6?auto=format&fit=crop&w=600&q=80',
     exifVerified: true,
     isMockLocation: false,
     severity: 'API_TERBUKA',
@@ -272,6 +320,7 @@ export const INITIAL_REPORTS: CitizenReportData[] = [
     verifiedBy: 'Komandan Posko BPBD Riau',
     verifiedAt: '10 Nov 2026, 07:02 WIB',
     createdAt: '10 Nov 2026, 06:59 WIB',
+    communityConfirmations: 9,
   },
   {
     id: 'rep-003',
@@ -284,7 +333,8 @@ export const INITIAL_REPORTS: CitizenReportData[] = [
     latitude: 0.8318,
     longitude: 102.8221,
     gpsAccuracyMeters: 2.8,
-    photoUrl: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=600&q=80',
+    photoUrl:
+      'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=600&q=80',
     exifVerified: true,
     isMockLocation: false,
     severity: 'ASAP_TIPIS',
@@ -294,6 +344,84 @@ export const INITIAL_REPORTS: CitizenReportData[] = [
     verifiedBy: null,
     verifiedAt: null,
     createdAt: '10 Nov 2026, 07:06 WIB',
+    communityConfirmations: 5,
+  },
+];
+
+export const INITIAL_PROPOSALS: CommunityProposalData[] = [
+  {
+    id: 'prop-01',
+    proposalCode: 'USUL-BRGM-01',
+    proposerName: 'Kelompok Tani Gambut Makmur',
+    villageName: 'Desa Pulau Padang, Kec. Merbau',
+    infrastructureType: 'SEKAT_KANAL',
+    latitude: 0.2645,
+    longitude: 102.4112,
+    urgency: 'TINGGI',
+    reason:
+      'Kanal drainase lama mengering cepat saat kemarau, perlu sekat kanal beton bertingkat (spillway) untuk menahan air kubah gambut.',
+    votes: 28,
+    status: 'DISETUJUI',
+    createdAt: '08 Nov 2026',
+  },
+  {
+    id: 'prop-02',
+    proposalCode: 'USUL-BRGM-02',
+    proposerName: 'MPA Desa Lukun & Tokoh Masyarakat',
+    villageName: 'Desa Lukun, Kec. Tebing Tinggi Timur',
+    infrastructureType: 'SUMUR_BOR',
+    latitude: 0.8365,
+    longitude: 102.8155,
+    urgency: 'TINGGI',
+    reason:
+      'Jarak sumber air ke titik rawan api mencapai 1,4 km. Warga mengusulkan 2 titik sumur bor artesis untuk suplai pompa pemadam.',
+    votes: 19,
+    status: 'DIKAJI_BRGM',
+    createdAt: '09 Nov 2026',
+  },
+  {
+    id: 'prop-03',
+    proposalCode: 'USUL-BRGM-03',
+    proposerName: 'Karang Taruna Sungai Tohor',
+    villageName: 'Desa Sungai Tohor, Kec. Tebing Tinggi Timur',
+    infrastructureType: 'EMBUNG_AIR',
+    latitude: 0.869,
+    longitude: 102.771,
+    urgency: 'SEDANG',
+    reason:
+      'Normalisasi embung penampungan air hujan di perbatasan kebun sagu warga untuk cadangan pembasahan gambut (rewetting).',
+    votes: 12,
+    status: 'DIUSULKAN_WARGA',
+    createdAt: '10 Nov 2026',
+  },
+];
+
+export const INITIAL_PATROLS: PatrolScheduleData[] = [
+  {
+    id: 'patrol-01',
+    teamName: 'Regu MPA Desa Pulau Padang - Sektor Utara',
+    coordinatorName: 'Ahmad Syafii',
+    phone: '+6285271993812',
+    sectorRoute: 'Jalur Sekat Kanal Blok A1 s/d Perbatasan Teluk Belitung',
+    scheduleDate: '2026-11-10',
+    shiftTime: 'SIANG (12:00-17:00)',
+    waterSourceStatus: 'KERING_KRITIS',
+    personnelCount: 8,
+    equipmentNotes: '2 Unit Pompa Jinjing Tohatsu, 6 Roll Selang, Drone Termal Desa',
+    createdAt: '10 Nov 2026, 06:30 WIB',
+  },
+  {
+    id: 'patrol-02',
+    teamName: 'Relawan Peduli Gambut Lukun Timur',
+    coordinatorName: 'M. Ridwan',
+    phone: '+6281275884410',
+    sectorRoute: 'Koridor Kebun Sagu Lukun - Kanal Sekat B3',
+    scheduleDate: '2026-11-11',
+    shiftTime: 'PAGI (07:00-12:00)',
+    waterSourceStatus: 'MENYUSUT_WASPADA',
+    personnelCount: 6,
+    equipmentNotes: '1 Pompa Apung, Alat Ukur TMA Manual, HT Komunitas',
+    createdAt: '10 Nov 2026, 07:10 WIB',
   },
 ];
 
@@ -314,3 +442,75 @@ export const INITIAL_TIMESERIES: TimeSeriesPoint[] = [
   { day: 'Hari Ini', date: '10 Nov', waterLevelTMA: -64.5, soilMoisture10cm: 28.4, soilMoisture40cm: 39.2, surfaceTemp: 38.6, pm25: 168, riskStatus: 'KRITIS', predictedRiskScore: 94.2, brgmLimit: -40 },
 ];
 
+// LocalStorage Keys & Shared Sync Helpers for Cross-Page Participatory Crowdsourcing
+export const STORAGE_KEYS = {
+  REPORTS: 'green_pulse_reports_v2',
+  PROPOSALS: 'green_pulse_proposals_v2',
+  PATROLS: 'green_pulse_patrols_v2',
+};
+
+export function getStoredReports(): CitizenReportData[] {
+  if (typeof window === 'undefined') return INITIAL_REPORTS;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEYS.REPORTS);
+    if (!raw) return INITIAL_REPORTS;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : INITIAL_REPORTS;
+  } catch {
+    return INITIAL_REPORTS;
+  }
+}
+
+export function saveStoredReports(reports: CitizenReportData[]) {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(STORAGE_KEYS.REPORTS, JSON.stringify(reports));
+    window.dispatchEvent(new Event('greenpulse-sync'));
+  } catch {
+    // ignore storage quota errors
+  }
+}
+
+export function getStoredProposals(): CommunityProposalData[] {
+  if (typeof window === 'undefined') return INITIAL_PROPOSALS;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEYS.PROPOSALS);
+    if (!raw) return INITIAL_PROPOSALS;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : INITIAL_PROPOSALS;
+  } catch {
+    return INITIAL_PROPOSALS;
+  }
+}
+
+export function saveStoredProposals(proposals: CommunityProposalData[]) {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(STORAGE_KEYS.PROPOSALS, JSON.stringify(proposals));
+    window.dispatchEvent(new Event('greenpulse-sync'));
+  } catch {
+    // ignore
+  }
+}
+
+export function getStoredPatrols(): PatrolScheduleData[] {
+  if (typeof window === 'undefined') return INITIAL_PATROLS;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEYS.PATROLS);
+    if (!raw) return INITIAL_PATROLS;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : INITIAL_PATROLS;
+  } catch {
+    return INITIAL_PATROLS;
+  }
+}
+
+export function saveStoredPatrols(patrols: PatrolScheduleData[]) {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(STORAGE_KEYS.PATROLS, JSON.stringify(patrols));
+    window.dispatchEvent(new Event('greenpulse-sync'));
+  } catch {
+    // ignore
+  }
+}
